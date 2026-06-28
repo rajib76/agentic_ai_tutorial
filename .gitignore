@@ -17,3 +17,5 @@ labs/embeddings_umap_*.png
 # Kept locally, not published
 CLAUDE.md
 *.bak
+.claude/
+enhancements/
