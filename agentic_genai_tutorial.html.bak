@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>From LLMs to Agents — A Developer's Guide to Generative & Agentic AI</title>
+<style>
+  :root {
+    --bg: #0b1020;
+    --bg-soft: #121a30;
+    --panel: #161f38;
+    --panel-2: #1b274a;
+    --ink: #e7ecf5;
+    --ink-soft: #aab4cc;
+    --ink-faint: #76829e;
+    --line: #28324f;
+    --brand: #6ea8fe;
+    --brand-2: #8b7bff;
+    --teal: #41d6c3;
+    --amber: #ffb454;
+    --rose: #ff7a90;
+    --green: #5fd38d;
+    --code-bg: #0e1426;
+    --radius: 14px;
+    --maxw: 980px;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: "SF Mono", "JetBrains Mono", "Fira Code", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: var(--font);
+    background: radial-gradient(1200px 700px at 80% -10%, #1a2444 0%, transparent 55%),
+                radial-gradient(1000px 600px at -10% 10%, #1d1840 0%, transparent 50%),
+                var(--bg);
+    color: var(--ink);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--brand); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Layout */
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 22px; }
+  .layout { display: grid; grid-template-columns: 250px 1fr; gap: 36px; max-width: 1320px; margin: 0 auto; padding: 0 22px; }
+  main { min-width: 0; }
+
+  /* Hero */
+  header.hero {
+    padding: 80px 0 56px;
+    border-bottom: 1px solid var(--line);
+    background:
+      radial-gradient(700px 300px at 70% 0%, rgba(110,168,254,.12), transparent 60%);
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--teal); font-weight: 600;
+    border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px;
+    background: rgba(65,214,195,.06);
+  }
+  h1.title {
+    font-size: clamp(34px, 5vw, 56px); line-height: 1.05; margin: 22px 0 16px;
+    letter-spacing: -.02em; font-weight: 800;
+    background: linear-gradient(120deg, #fff 10%, #b9c6ff 55%, #8b7bff 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .lede { font-size: 19px; color: var(--ink-soft); max-width: 760px; }
+  .meta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+  .pill {
+    font-size: 13px; color: var(--ink-soft);
+    border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px;
+    background: var(--panel);
+  }
+  .pill b { color: var(--ink); font-weight: 600; }
+
+  /* Sidebar nav */
+  aside.toc {
+    position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+    padding: 28px 0; font-size: 14px;
+  }
+  aside.toc .toc-title { font-size: 12px; text-transform: uppercase; letter-spacing: .14em; color: var(--ink-faint); margin: 0 0 14px; }
+  aside.toc ol { list-style: none; margin: 0; padding: 0; }
+  aside.toc li { margin: 2px 0; }
+  aside.toc a { color: var(--ink-soft); display: block; padding: 6px 12px; border-radius: 8px; border-left: 2px solid transparent; }
+  aside.toc a:hover { background: var(--panel); color: var(--ink); text-decoration: none; }
+  aside.toc .sub { padding-left: 14px; font-size: 13px; }
+  aside.toc .sub a { color: var(--ink-faint); padding: 4px 12px; }
+
+  /* Sections */
+  section.chapter { padding: 56px 0; border-bottom: 1px solid var(--line); }
+  .sec-num {
+    font-family: var(--mono); font-size: 13px; color: var(--brand);
+    letter-spacing: .1em; text-transform: uppercase; font-weight: 600;
+  }
+  h2 { font-size: clamp(26px, 3.4vw, 36px); margin: 10px 0 8px; letter-spacing: -.02em; font-weight: 800; }
+  h3 { font-size: 21px; margin: 38px 0 10px; font-weight: 700; color: #fff; }
+  h4 { font-size: 16px; margin: 22px 0 6px; font-weight: 700; color: var(--ink); }
+  p { color: var(--ink-soft); }
+  main p strong, li strong { color: var(--ink); font-weight: 650; }
+  .section-intro { font-size: 18px; color: var(--ink-soft); max-width: 780px; }
+
+  ul, ol { color: var(--ink-soft); }
+  li { margin: 7px 0; }
+
+  /* Callouts */
+  .callout {
+    border: 1px solid var(--line); border-left: 4px solid var(--brand);
+    background: var(--panel); border-radius: 10px; padding: 16px 18px; margin: 22px 0;
+  }
+  .callout.key { border-left-color: var(--teal); }
+  .callout.warn { border-left-color: var(--amber); }
+  .callout.note { border-left-color: var(--brand-2); }
+  .callout .tag { font-size: 12px; text-transform: uppercase; letter-spacing: .12em; font-weight: 700; color: var(--teal); margin-bottom: 4px; }
+  .callout.warn .tag { color: var(--amber); }
+  .callout.note .tag { color: var(--brand-2); }
+  .callout p { margin: 4px 0 0; color: var(--ink-soft); }
+
+  /* Concept cards */
+  .grid { display: grid; gap: 16px; margin: 24px 0; }
+  .grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+  .card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px;
+  }
+  .card h4 { margin-top: 0; display: flex; align-items: center; gap: 8px; }
+  .card .ic { width: 26px; height: 26px; flex: 0 0 26px; }
+  .card p { font-size: 14.5px; margin: 6px 0 0; }
+
+  /* Code */
+  pre {
+    background: var(--code-bg); border: 1px solid var(--line); border-radius: 10px;
+    padding: 16px 18px; overflow-x: auto; font-family: var(--mono); font-size: 13.5px;
+    line-height: 1.6; color: #cdd6f4; margin: 18px 0;
+  }
+  code { font-family: var(--mono); font-size: .92em; background: var(--bg-soft); padding: 1px 6px; border-radius: 5px; color: #c9d4ff; }
+  pre code { background: none; padding: 0; color: inherit; }
+  .c-kw { color: #c792ea; } .c-str { color: #c3e88d; } .c-com { color: #5c6a86; font-style: italic; }
+  .c-fn { color: #82aaff; } .c-num { color: #f78c6c; }
+
+  /* Figures / diagrams */
+  figure { margin: 30px 0; }
+  .diagram {
+    background: linear-gradient(180deg, var(--panel) 0%, #131c34 100%);
+    border: 1px solid var(--line); border-radius: 16px; padding: 22px; overflow-x: auto;
+  }
+  figcaption { font-size: 13.5px; color: var(--ink-faint); margin-top: 12px; text-align: center; }
+  svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+  svg text { font-family: var(--font); }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; margin: 22px 0; font-size: 14.5px; }
+  th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--ink); font-weight: 700; background: var(--panel); }
+  td { color: var(--ink-soft); }
+  tr:hover td { background: rgba(110,168,254,.04); }
+
+  /* Citations */
+  sup.cite { font-size: 12px; line-height: 0; }
+  sup.cite a {
+    color: var(--teal); font-weight: 700; padding: 0 2px;
+  }
+  .src-line { font-size: 13px; color: var(--ink-faint); margin: 14px 0 0; }
+  .src-line a { color: var(--brand); }
+
+  /* References */
+  ol.refs { counter-reset: ref; list-style: none; padding: 0; }
+  ol.refs li {
+    counter-increment: ref; position: relative; padding: 14px 0 14px 46px;
+    border-bottom: 1px solid var(--line); font-size: 14.5px; color: var(--ink-soft);
+  }
+  ol.refs li::before {
+    content: "[" counter(ref) "]"; position: absolute; left: 0; top: 14px;
+    font-family: var(--mono); font-size: 12.5px; color: var(--teal); font-weight: 700;
+  }
+  ol.refs li:target { background: rgba(65,214,195,.07); border-radius: 8px; padding-left: 52px; }
+  ol.refs b { color: var(--ink); }
+  ol.refs .auth { color: var(--ink-faint); }
+
+  /* Spectrum bar */
+  .spectrum { margin: 26px 0; }
+
+  /* Footer */
+  footer { padding: 50px 0 70px; color: var(--ink-faint); font-size: 14px; }
+  footer .wrap { text-align: center; }
+
+  /* Progress bar */
+  #progress { position: fixed; top: 0; left: 0; height: 3px; width: 0%; background: linear-gradient(90deg, var(--brand), var(--brand-2), var(--teal)); z-index: 999; transition: width .1s; }
+
+  @media (max-width: 1040px) {
+    .layout { grid-template-columns: 1fr; }
+    aside.toc { display: none; }
+  }
+  @media (max-width: 640px) {
+    .grid.cols-2, .grid.cols-3, .grid.cols-4 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div id="progress"></div>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">● A Beginner-to-Practitioner Guide</span>
+    <h1 class="title">From LLMs to Agents</h1>
+    <p class="lede">A developer's guide to <strong>Generative &amp; Agentic AI</strong> — how large language models work, why they hallucinate, how Retrieval-Augmented Generation grounds them in truth, and how memory, planning, and tools turn a model into an autonomous agent. Every concept is backed by a verifiable, authoritative source.</p>
+    <div class="meta-row">
+      <span class="pill">📘 <b>5 chapters</b></span>
+      <span class="pill">🧭 For <b>developers new to GenAI</b></span>
+      <span class="pill">🔗 <b>25+ cited sources</b></span>
+      <span class="pill">🖼️ <b>Visual diagrams throughout</b></span>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="toc">
+    <p class="toc-title">Contents</p>
+    <ol>
+      <li><a href="#map">1 · The Big Picture</a></li>
+      <li class="sub"><a href="#map-nest">AI → ML → GenAI</a></li>
+      <li class="sub"><a href="#map-why">Why "generative"?</a></li>
+      <li class="sub"><a href="#map-agentic">Where agentic fits</a></li>
+      <li><a href="#s1">2 · The Origin of LLMs</a></li>
+      <li class="sub"><a href="#s1-what">What an LLM is</a></li>
+      <li class="sub"><a href="#s1-build">How they are built</a></li>
+      <li class="sub"><a href="#s1-work">How they work</a></li>
+      <li class="sub"><a href="#s1-hall">Why they hallucinate</a></li>
+      <li><a href="#emb">3 · Embeddings, Simply</a></li>
+      <li class="sub"><a href="#emb-map">Words on a map</a></li>
+      <li class="sub"><a href="#emb-math">Meaning as math</a></li>
+      <li class="sub"><a href="#emb-why">Why it matters</a></li>
+      <li><a href="#s2">4 · Grounding with RAG</a></li>
+      <li class="sub"><a href="#s2-what">What RAG is</a></li>
+      <li class="sub"><a href="#s2-pipe">The RAG pipeline</a></li>
+      <li class="sub"><a href="#s2-chunk">Chunking &amp; retrieval</a></li>
+      <li><a href="#s3">5 · The Birth of Agents</a></li>
+      <li class="sub"><a href="#s3-what">What an agent is</a></li>
+      <li class="sub"><a href="#s3-loop">The agent loop</a></li>
+      <li class="sub"><a href="#s3-build">How to build one</a></li>
+      <li><a href="#s4">6 · Multi-Agent Orchestration</a></li>
+      <li class="sub"><a href="#s4-spectrum">The autonomy spectrum</a></li>
+      <li class="sub"><a href="#s4-patterns">Orchestration patterns</a></li>
+      <li><a href="#s5">7 · Use Cases of Agentic AI</a></li>
+      <li><a href="#refs">References</a></li>
+      <li><a href="#glossary">Glossary</a></li>
+    </ol>
+  </aside>
+
+  <main>
+
+  <!-- ===================== SECTION 1 · THE BIG PICTURE ===================== -->
+  <section class="chapter" id="map">
+    <span class="sec-num">Section 01</span>
+    <h2>The Big Picture — Where Generative &amp; Agentic AI Fit</h2>
+    <p class="section-intro">"AI," "machine learning," "generative AI," "agents" — these words get thrown around as if they mean the same thing. They don't. Before we open the hood, let's draw the map so you always know what is a part of what — and answer a question most tutorials skip: <strong>why is it even called "generative"?</strong></p>
+
+    <h3 id="map-nest">Nested fields: AI contains ML contains Generative AI</h3>
+    <p>The cleanest way to picture this is as a set of <strong>nested circles</strong>, each one a more specialized slice of the one around it.</p>
+
+    <figure>
+      <div class="diagram">
+        <svg viewBox="0 0 780 480" role="img" aria-label="Nested fields of AI, from Artificial Intelligence down to LLMs">
+          <!-- concentric rings, centered at (235,240) -->
+          <circle cx="235" cy="240" r="218" fill="#0f1730" stroke="#2b3a63" stroke-width="1.5"/>
+          <circle cx="235" cy="240" r="172" fill="#131d38" stroke="#3a4a78" stroke-width="1.5"/>
+          <circle cx="235" cy="240" r="126" fill="#172246" stroke="#4a5fa0" stroke-width="1.5"/>
+          <circle cx="235" cy="240" r="80"  fill="#1d1438" stroke="#8b7bff" stroke-width="1.5"/>
+          <circle cx="235" cy="240" r="40"  fill="#16213d" stroke="#41d6c3" stroke-width="2"/>
+
+          <text x="235" y="44"  fill="#6ea8fe" font-size="13" font-weight="800" text-anchor="middle" letter-spacing="0.5">ARTIFICIAL INTELLIGENCE</text>
+          <text x="235" y="90"  fill="#8b9bd4" font-size="12.5" font-weight="700" text-anchor="middle" letter-spacing="0.5">MACHINE LEARNING</text>
+          <text x="235" y="135" fill="#aab6ec" font-size="12" font-weight="700" text-anchor="middle" letter-spacing="0.5">DEEP LEARNING</text>
+          <text x="235" y="180" fill="#c9b8ff" font-size="11.5" font-weight="700" text-anchor="middle" letter-spacing="0.5">GENERATIVE AI</text>
+          <text x="235" y="237" fill="#41d6c3" font-size="13" font-weight="800" text-anchor="middle">LLMs</text>
+          <text x="235" y="253" fill="#7fe4d2" font-size="9.5" text-anchor="middle">+ image / audio</text>
+
+          <!-- legend on the right -->
+          <g font-size="12.5">
+            <rect x="486" y="60" width="13" height="13" rx="3" fill="#0f1730" stroke="#2b3a63"/><text x="508" y="64" fill="#e7ecf5" font-weight="700">Artificial Intelligence</text><text x="508" y="82" fill="#aab4cc" font-size="11.5">Machines doing tasks that need human-like intelligence.</text>
+            <rect x="486" y="118" width="13" height="13" rx="3" fill="#131d38" stroke="#3a4a78"/><text x="508" y="122" fill="#e7ecf5" font-weight="700">Machine Learning</text><text x="508" y="140" fill="#aab4cc" font-size="11.5">Learns patterns from data instead of hand-coded rules.</text>
+            <rect x="486" y="176" width="13" height="13" rx="3" fill="#172246" stroke="#4a5fa0"/><text x="508" y="180" fill="#e7ecf5" font-weight="700">Deep Learning</text><text x="508" y="198" fill="#aab4cc" font-size="11.5">ML using many-layered neural networks.</text>
+            <rect x="486" y="234" width="13" height="13" rx="3" fill="#1d1438" stroke="#8b7bff"/><text x="508" y="238" fill="#c9b8ff" font-weight="700">Generative AI</text><text x="508" y="256" fill="#aab4cc" font-size="11.5">Creates brand-new content: text, images, audio, code.</text>
+            <rect x="486" y="292" width="13" height="13" rx="3" fill="#16213d" stroke="#41d6c3"/><text x="508" y="296" fill="#41d6c3" font-weight="700">LLMs</text><text x="508" y="314" fill="#aab4cc" font-size="11.5">Generative models specialized for language.</text>
+          </g>
+          <!-- agentic note -->
+          <line x1="486" y1="350" x2="752" y2="350" stroke="#28324f"/>
+          <rect x="486" y="364" width="13" height="13" rx="3" fill="#0b1020" stroke="#ff7a90" stroke-dasharray="3 2"/>
+          <text x="508" y="368" fill="#ffaeba" font-weight="700" font-size="12.5">Agentic AI</text>
+          <text x="508" y="386" fill="#aab4cc" font-size="11.5">Not a new circle — a system pattern built on top of</text>
+          <text x="508" y="402" fill="#aab4cc" font-size="11.5">generative models (see below).</text>
+        </svg>
+      </div>
+      <figcaption>Each field is a specialized subset of the one outside it. <strong>Generative AI</strong> is a use of deep learning; <strong>LLMs</strong> are generative models for language. <strong>Agentic AI</strong> isn't shown as a ring because it's a pattern layered <em>on top</em> of these — covered at the end of this section.<sup class="cite"><a href="#ref40">[40]</a><a href="#ref41">[41]</a><a href="#ref42">[42]</a></sup></figcaption>
+    </figure>
+
+    <p>Reading from the outside in: <strong>Artificial Intelligence</strong> is the broad ambition of machines doing things that normally require human intelligence.<sup class="cite"><a href="#ref40">[40]</a></sup> <strong>Machine Learning</strong> is the subset that gets there by <em>learning from data</em> rather than following rules a programmer wrote by hand. <strong>Deep Learning</strong> is the subset of ML built on multi-layered neural networks — the engine behind the last decade's breakthroughs.<sup class="cite"><a href="#ref41">[41]</a><a href="#ref42">[42]</a></sup> <strong>Generative AI</strong> is the slice of deep learning whose purpose is to <em>create</em> new content. And <strong>LLMs</strong> are generative models that specialize in language — one type of "foundation model."<sup class="cite"><a href="#ref45">[45]</a></sup></p>
+
+    <h3 id="map-why">Why is it called "generative"?</h3>
+    <p>The name draws a line between the two great families of machine-learning models. The distinction is classic and was crisply framed by Ng &amp; Jordan.<sup class="cite"><a href="#ref43">[43]</a></sup></p>
+
+    <figure>
+      <div class="diagram">
+        <svg viewBox="0 0 820 270" role="img" aria-label="Discriminative versus generative models">
+          <defs><marker id="bp-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#41d6c3"/></marker></defs>
+          <!-- LEFT: discriminative -->
+          <rect x="20" y="20" width="380" height="230" rx="14" fill="rgba(110,168,254,.05)" stroke="#2b3a63"/>
+          <text x="40" y="48" fill="#6ea8fe" font-size="14" font-weight="800">DISCRIMINATIVE</text>
+          <text x="40" y="68" fill="#aab4cc" font-size="12">Tells things apart — draws a boundary.</text>
+          <!-- two classes + boundary -->
+          <g>
+            <circle cx="110" cy="120" r="6" fill="#6ea8fe"/><circle cx="140" cy="150" r="6" fill="#6ea8fe"/><circle cx="95" cy="165" r="6" fill="#6ea8fe"/><circle cx="135" cy="190" r="6" fill="#6ea8fe"/><circle cx="105" cy="205" r="6" fill="#6ea8fe"/>
+            <circle cx="300" cy="115" r="6" fill="#ff7a90"/><circle cx="270" cy="140" r="6" fill="#ff7a90"/><circle cx="315" cy="160" r="6" fill="#ff7a90"/><circle cx="285" cy="185" r="6" fill="#ff7a90"/><circle cx="320" cy="205" r="6" fill="#ff7a90"/>
+            <line x1="205" y1="95" x2="205" y2="225" stroke="#ffb454" stroke-width="2.5" stroke-dasharray="6 4"/>
+          </g>
+          <text x="205" y="244" fill="#ffb454" font-size="11.5" text-anchor="middle" font-style="italic">"cat or dog?  spam or not?"</text>
+
+          <!-- RIGHT: generative -->
+          <rect x="420" y="20" width="380" height="230" rx="14" fill="rgba(139,123,255,.06)" stroke="#3a2f63"/>
+          <text x="440" y="48" fill="#c9b8ff" font-size="14" font-weight="800">GENERATIVE</text>
+          <text x="440" y="68" fill="#aab4cc" font-size="12">Learns the pattern — makes brand-new examples.</text>
+          <g>
+            <circle cx="510" cy="125" r="6" fill="#8b7bff"/><circle cx="545" cy="150" r="6" fill="#8b7bff"/><circle cx="520" cy="180" r="6" fill="#8b7bff"/><circle cx="560" cy="195" r="6" fill="#8b7bff"/><circle cx="500" cy="160" r="6" fill="#8b7bff"/>
+            <!-- new generated sample -->
+            <circle cx="690" cy="150" r="9" fill="#16321f" stroke="#5fd38d" stroke-width="2.5"/>
+            <text x="690" y="125" fill="#5fd38d" font-size="11" text-anchor="middle" font-weight="700">new!</text>
+            <line x1="575" y1="160" x2="675" y2="152" stroke="#41d6c3" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#bp-arr)"/>
+          </g>
+          <text x="610" y="244" fill="#5fd38d" font-size="11.5" text-anchor="middle" font-style="italic">"write a new sentence, draw a new image"</text>
+        </svg>
+      </div>
+      <figcaption>A <strong>discriminative</strong> model separates what already exists (which class is this?). A <strong>generative</strong> model learns the underlying pattern well enough to produce something new that never existed.<sup class="cite"><a href="#ref43">[43]</a></sup></figcaption>
+    </figure>
+
+    <table>
+      <thead><tr><th>Question it answers</th><th>Discriminative</th><th>Generative</th></tr></thead>
+      <tbody>
+        <tr><td>What is it doing?</td><td>Separating / labeling existing data</td><td>Creating new data</td></tr>
+        <tr><td>Typical task</td><td>"Is this email spam?" "Cat or dog?"</td><td>"Write a poem." "Generate an image."</td></tr>
+        <tr><td>What it models</td><td>The boundary between classes</td><td>How the data itself is produced</td></tr>
+        <tr><td>Examples</td><td>Spam filters, image classifiers</td><td>LLMs, image generators (GANs, diffusion)<sup class="cite"><a href="#ref44">[44]</a></sup></td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout key">
+      <div class="tag">So, why "generative"?</div>
+      <p>Because the model <strong>generates</strong> — it produces brand-new content rather than just labeling what already exists. Remember Section 2's next-token prediction: an LLM <em>writes</em> the next word, then the next, building original text that was never in its training data. That act of creation is exactly what makes it <strong>generative</strong> AI.</p>
+    </div>
+
+    <h3 id="map-agentic">Where does Agentic AI fit?</h3>
+    <p>Here's the key insight that confuses many beginners: <strong>agentic AI is not a new kind of model.</strong> There is no separate "agent neural network." Agentic AI is a <em>system pattern</em> that takes a generative model — usually an LLM — and wraps it with the ability to <strong>plan, remember, and use tools</strong>, so it can take actions and pursue a goal instead of just returning one block of text.</p>
+
+    <figure>
+      <div class="diagram">
+        <svg viewBox="0 0 820 180" role="img" aria-label="Agentic AI is built on top of a generative model">
+          <defs><marker id="ag-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6ea8fe"/></marker></defs>
+          <!-- generative core -->
+          <rect x="30" y="55" width="170" height="70" rx="12" fill="#1d1438" stroke="#8b7bff" stroke-width="2"/>
+          <text x="115" y="85" fill="#c9b8ff" font-size="14" font-weight="700" text-anchor="middle">Generative model</text>
+          <text x="115" y="105" fill="#aab4cc" font-size="11.5" text-anchor="middle">(LLM) — the "brain"</text>
+
+          <text x="232" y="95" fill="#76829e" font-size="22" text-anchor="middle">+</text>
+
+          <!-- wrappers -->
+          <rect x="262" y="55" width="150" height="70" rx="12" fill="#16213d" stroke="#6ea8fe"/>
+          <text x="337" y="80" fill="#6ea8fe" font-size="12.5" font-weight="700" text-anchor="middle">Planning · Memory</text>
+          <text x="337" y="100" fill="#6ea8fe" font-size="12.5" font-weight="700" text-anchor="middle">· Tools</text>
+
+          <text x="444" y="95" fill="#76829e" font-size="22" text-anchor="middle">=</text>
+
+          <!-- agentic -->
+          <rect x="474" y="55" width="150" height="70" rx="12" fill="#3a1f28" stroke="#ff7a90" stroke-width="2"/>
+          <text x="549" y="85" fill="#ffaeba" font-size="14" font-weight="800" text-anchor="middle">Agentic AI</text>
+          <text x="549" y="105" fill="#aab4cc" font-size="11.5" text-anchor="middle">a system that acts</text>
+
+          <line x1="624" y1="90" x2="668" y2="90" stroke="#6ea8fe" stroke-width="2" marker-end="url(#ag-arr)"/>
+          <rect x="676" y="55" width="120" height="70" rx="12" fill="#16321f" stroke="#5fd38d"/>
+          <text x="736" y="85" fill="#9ff0bd" font-size="13" font-weight="700" text-anchor="middle">Pursues goals</text>
+          <text x="736" y="104" fill="#aab4cc" font-size="11" text-anchor="middle">in the real world</text>
+
+          <text x="410" y="28" fill="#e7ecf5" font-size="13" font-weight="700" text-anchor="middle">Generative AI gives the brain — Agentic AI adds hands, memory, and initiative</text>
+        </svg>
+      </div>
+      <figcaption>Agentic AI = a generative model (the reasoning core) wrapped with planning, memory, and tools. It sits <em>on top of</em> generative AI, which is why it doesn't appear as a ring in the nested diagram.</figcaption>
+    </figure>
+
+    <div class="callout note">
+      <div class="tag">Your roadmap from here</div>
+      <p>This tutorial climbs that ladder in order: <strong>LLMs</strong> (the generative brain, Section 2), <strong>embeddings</strong> (Section 3) and <strong>RAG</strong> (Section 4) that ground it in facts, then <strong>agents</strong> (Section 5) and <strong>multi-agent orchestration</strong> (Section 6) that give it hands and autonomy — closing with real-world <strong>use cases</strong> (Section 7).</p>
+    </div>
+
+    <p class="src-line">Sources for this section: AIMA (definition of AI) <a href="#ref40">[40]</a>, Deep Learning textbook <a href="#ref41">[41]</a>, LeCun-Bengio-Hinton <a href="#ref42">[42]</a>, discriminative vs generative <a href="#ref43">[43]</a>, GANs <a href="#ref44">[44]</a>, foundation models <a href="#ref45">[45]</a>.</p>
+  </section>
+
+  <!-- ===================== SECTION 2 ===================== -->
+  <section class="chapter" id="s1">
+    <span class="sec-num">Section 02</span>
+    <h2>The Origin of LLMs</h2>
+    <p class="section-intro">Before agents, before RAG, there was the language model. To understand everything that follows, you need a clear mental model of what a Large Language Model (LLM) actually is — and, crucially, what it is <em>not</em>.</p>
+
+    <h3 id="s1-what">What is a Large Language Model?</h3>
+    <p>A <strong>Large Language Model</strong> is a neural network trained on enormous amounts of text to do one deceptively simple thing: <strong>predict the next token</strong> (a word or word-fragment) given the text so far. By learning to predict the next token across trillions of words, the model implicitly learns grammar, facts, reasoning patterns, and writing styles. The landmark GPT-3 paper showed that once such a model is large enough, it can perform many tasks it was never explicitly trained for, simply from a few examples in the prompt.<sup class="cite"><a href="#ref2">[2]</a></sup></p>
+
+    <div class="callout key">
+      <div class="tag">Core idea</div>
+      <p>An LLM is a <strong>probabilistic next-token predictor</strong>. It does not "look up" answers in a database. It generates the most statistically plausible continuation of your text, one token at a time. This single fact explains both its magic and its flaws.</p>
+    </div>
+
+    <h3 id="s1-build">How are they built?</h3>
+    <p>Modern LLMs are built on the <strong>Transformer</strong> architecture, introduced in the 2017 paper <em>"Attention Is All You Need."</em> Its key innovation — <strong>self-attention</strong> — lets the model weigh the relevance of every word to every other word in a sequence, in parallel, instead of reading strictly left-to-right. This made it possible to train far larger models on far more data.<sup class="cite"><a href="#ref1">[1]</a></sup></p>
+
+    <p>Building an LLM happens in stages:</p>
+
+    <div class="grid cols-3">
+      <div class="card">
+        <h4><span style="color:var(--brand)">1.</span> Pre-training</h4>
+        <p>The model reads a huge corpus (web pages, books, code) and learns next-token prediction. This is where raw knowledge and language ability come from. <strong>Scaling laws</strong> show that performance improves predictably as you grow model size, data, and compute.<sup class="cite"><a href="#ref3">[3]</a></sup></p>
+      </div>
+      <div class="card">
+        <h4><span style="color:var(--brand-2)">2.</span> Supervised fine-tuning</h4>
+        <p>The pre-trained model is further trained on curated examples of <em>instructions and good answers</em>, teaching it to be a helpful assistant rather than just an autocomplete engine.<sup class="cite"><a href="#ref4">[4]</a></sup></p>
+      </div>
+      <div class="card">
+        <h4><span style="color:var(--teal)">3.</span> RLHF alignment</h4>
+        <p><strong>Reinforcement Learning from Human Feedback</strong> uses human preference ratings to make answers more helpful, honest, and harmless. This is the step that produced models like InstructGPT and ChatGPT.<sup class="cite"><a href="#ref4">[4]</a></sup></p>
+      </div>
+    </div>
+
+    <figure>
+      <div class="diagram">
+        <svg viewBox="0 0 880 200" role="img" aria-label="LLM training pipeline">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="#6ea8fe"/>
+            </marker>
+          </defs>
+          <!-- stage 1 -->
+          <rect x="20" y="60" width="180" height="80" rx="12" fill="#1b274a" stroke="#28324f"/>
+          <text x="110" y="92" fill="#e7ecf5" font-size="15" font-weight="700" text-anchor="middle">Pre-training</text>
+          <text x="110" y="114" fill="#aab4cc" font-size="12" text-anchor="middle">trillions of tokens</text>
+          <text x="110" y="130" fill="#76829e" font-size="11" text-anchor="middle">→ raw knowledge</text>
+          <!-- stage 2 -->
+          <rect x="350" y="60" width="180" height="80" rx="12" fill="#1b274a" stroke="#28324f"/>
+          <text x="440" y="92" fill="#e7ecf5" font-size="15" font-weight="700" text-anchor="middle">Fine-tuning (SFT)</text>
+          <text x="440" y="114" fill="#aab4cc" font-size="12" text-anchor="middle">instruction → answer</text>
+          <text x="440" y="130" fill="#76829e" font-size="11" text-anchor="middle">→ follows instructions</text>
+          <!-- stage 3 -->
+          <rect x="680" y="60" width="180" height="80" rx="12" fill="#1b274a" stroke="#28324f"/>
+          <text x="770" y="92" fill="#e7ecf5" font-size="15" font-weight="700" text-anchor="middle">RLHF</text>
+          <text x="770" y="114" fill="#aab4cc" font-size="12" text-anchor="middle">human preferences</text>
+          <text x="770" y="130" fill="#76829e" font-size="11" text-anchor="middle">→ aligned assistant</text>
+          <line x1="205" y1="100" x2="345" y2="100" stroke="#6ea8fe" stroke-width="2" marker-end="url(#arrow)"/>
+          <line x1="535" y1="100" x2="675" y2="100" stroke="#6ea8fe" stroke-width="2" marker-end="url(#arrow)"/>
+        </svg>
+      </div>
+      <figcaption>The three-stage recipe behind a modern instruction-following LLM.</figcaption>
+    </figure>
+
+    <h3 id="s1-work">How do they actually work?</h3>
+    <p>When you send a prompt, four things happen under the hood:</p>
+
+    <div class="grid cols-2">
+      <div class="card">
+        <h4>① Tokenization</h4>
+        <p>Your text is split into <strong>tokens</strong> — common words or sub-word fragments — using algorithms like Byte-Pair Encoding. "tokenization" might become <code>token</code> + <code>ization</code>. Models think in tokens, not letters.<sup class="cite"><a href="#ref5">[5]</a></sup></p>
+      </div>
+      <div class="card">
+        <h4>② Embeddings</h4>
+        <p>Each token becomes a high-dimensional <strong>vector</strong> — a list of numbers capturing meaning. Tokens with similar meanings sit close together in this "vector space." (We reuse this idea heavily in RAG.)</p>
+      </div>
+      <div class="card">
+        <h4>③ Attention</h4>
+        <p>Stacked Transformer layers use <strong>self-attention</strong> to let every token gather context from every other token, building a rich representation of what your prompt means.<sup class="cite"><a href="#ref1">[1]</a></sup></p>
+      </div>
+      <div class="card">
+        <h4>④ Next-token sampling</h4>
+        <p>The model outputs a probability for every possible next token. One is sampled (the <strong>temperature</strong> setting controls how "creative" vs. deterministic this is), appended, and the loop repeats.</p>
+      </div>
+    </div>
+
+    <figure>
+      <div class="diagram">
+        <svg viewBox="0 0 880 360" role="img" aria-label="Autoregressive token generation, unrolled over four steps">
+          <defs>
+            <marker id="ntp-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#41d6c3"/></marker>
+            <marker id="ntp-grey" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#76829e"/></marker>
+          </defs>
+
+          <!-- column headers -->
+          <text x="40" y="26" fill="#76829e" font-size="11.5" font-weight="600" letter-spacing="0.5">STEP</text>
+          <text x="110" y="26" fill="#76829e" font-size="11.5" font-weight="600" letter-spacing="0.5">INPUT SEQUENCE (the prompt so far)</text>
+          <text x="690" y="26" fill="#41d6c3" font-size="11.5" font-weight="600" letter-spacing="0.5">PREDICTS →</text>
+
+          <!-- ============ STEP 1 : center y=70 ============ -->
+          <text x="48" y="76" fill="#6ea8fe" font-size="15" font-weight="800" text-anchor="middle">1</text>
+          <rect x="110" y="53" width="58" height="34" rx="7" fill="#1b274a" stroke="#28324f"/><text x="139" y="75" fill="#e7ecf5" font-size="13" text-anchor="middle">The</text>
+          <rect x="176" y="53" width="58" height="34" rx="7" fill="#1b274a" stroke="#28324f"/><text x="205" y="75" fill="#e7ecf5" font-size="13" text-anchor="middle">sky</text>
+          <rect x="242" y="53" width="58" height="34" rx="7" fill="#1b274a" stroke="#28324f"/><text x="271" y="75" fill="#e7ecf5" font-size="13" text-anchor="middle">is</text>
+          <line x1="660" y1="70" x2="700" y2="70" stroke="#41d6c3" stroke-width="1.8" marker-end="url(#ntp-arr)"/>
+          <rect x="708" y="53" width="74" height="34" rx="7" fill="#16213d" stroke="#41d6c3" stroke-width="2"/><text x="745" y="75" fill="#41d6c3" font-size="13" font-weight="700" text-anchor="middle">blue</text>
+          <text x="828" y="74" fill="#76829e" font-size="11" text-anchor="middle">p=.62</text>
+
+          <!-- ============ STEP 2 : center y=145 ============ -->
+          <text x="48" y="151" fill="#6ea8fe" font-size="15" font-weight="800" text-anchor="middle">2</text>
+          <rect x="110" y="128" width="58" height="34" rx="7" fill="#1b274a" stroke="#28324f"/><text x="139" y="150" fill="#e7ecf5" font-size="13" text-anchor="middle">The</text>
+          <rect x="176" y="128" width="58" height="34" rx="7" fill="#1b274a" stroke="#28324f"/><text x="205" y="150" fill="#e7ecf5" font-size="13" text-anchor="middle">sky</text>
+          <rect x="242" y="128" width="58" height="34" rx="7" fill="#1b274a" stroke="#28324f"/><text x="271" y="150" fill="#e7ecf5" font-size="13" text-anchor="middle">is</text>
+          <rect x="308" y="128" width="74" height="34" rx="7" fill="#14241f" stroke="#2f6f60"/><text x="345" y="150" fill="#7fe4d2" font-size="13" text-anchor="middle">blue</text>
+          <line x1="660" y1="145" x2="700" y2="145" stroke="#41d6c3" stroke-width="1.8" marker-end="url(#ntp-arr)"/>
+          <rect x="708" y="128" width="74" height="34" rx="7" fill="#16213d" stroke="#41d6c3" stroke-width="2"/><text x="745" y="150" fill="#41d6c3" font-size="13" font-weight="700" text-anchor="middle">and</text>
+          <text x="828" y="149" fill="#76829e" font-size="11" text-anchor="middle">p=.48</text>
+
+          <!-- ============ STEP 3 : center y=220 ============ -->
+          <text x="48" y="226" fill="#6ea8fe" font-size="15" font-weight="800" text-anchor="middle">3</text>
+          <rect x="110" y="203" width="58" height="34" rx="7" fill="#1b274a" stroke="#28324f"/><text x="139" y="225" fill="#e7ecf5" font-size="13" text-anchor="middle">The</text>
+          <rect x="176" y="203" width="58" height="34" rx="7" fill="#1b274a" stroke="#28324f"/><text x="205" y="225" fill="#e7ecf5" font-size="13" text-anchor="middle">sky</text>
+          <rect x="242" y="203" width="58" height="34" rx="7" fill="#1b274a" stroke="#28324f"/><text x="271" y="225" fill="#e7ecf5" font-size="13" text-anchor="middle">is</text>
+          <rect x="308" y="203" width="74" height="34" rx="7" fill="#1b274a" stroke="#28324f"/><text x="345" y="225" fill="#e7ecf5" font-size="13" text-anchor="middle">blue</text>
+          <rect x="390" y="203" width="74" height="34" rx="7" fill="#14241f" stroke="#2f6f60"/><text x="427" y="225" fill="#7fe4d2" font-size="13" text-anchor="middle">and</text>
+          <line x1="660" y1="220" x2="700" y2="220" stroke="#41d6c3" stroke-width="1.8" marker-end="url(#ntp-arr)"/>
+          <rect x="708" y="203" width="74" height="34" rx="7" fill="#16213d" stroke="#41d6c3" stroke-width="2"/><text x="745" y="225" fill="#41d6c3" font-size="13" font-weight="700" text-anchor="middle">clear</text>
+          <text x="828" y="224" fill="#76829e" font-size="11" text-anchor="middle">p=.55</text>
+
+          <!-- ============ STEP 4 : center y=295 ============ -->
+          <text x="48" y="301" fill="#6ea8fe" font-size="15" font-weight="800" text-anchor="middle">4</text>
+          <rect x="110" y="278" width="58" height="34" rx="7" fill="#1b274a" stroke="#28324f"/><text x="139" y="300" fill="#e7ecf5" font-size="13" text-anchor="middle">The</text>
+          <rect x="176" y="278" width="58" height="34" rx="7" fill="#1b274a" stroke="#28324f"/><text x="205" y="300" fill="#e7ecf5" font-size="13" text-anchor="middle">sky</text>
+          <rect x="242" y="278" width="58" height="34" rx="7" fill="#1b274a" stroke="#28324f"/><text x="271" y="300" fill="#e7ecf5" font-size="13" text-anchor="middle">is</text>
+          <rect x="308" y="278" width="74" height="34" rx="7" fill="#1b274a" stroke="#28324f"/><text x="345" y="300" fill="#e7ecf5" font-size="13" text-anchor="middle">blue</text>
+          <rect x="390" y="278" width="74" height="34" rx="7" fill="#1b274a" stroke="#28324f"/><text x="427" y="300" fill="#e7ecf5" font-size="13" text-anchor="middle">and</text>
+          <rect x="472" y="278" width="74" height="34" rx="7" fill="#14241f" stroke="#2f6f60"/><text x="509" y="300" fill="#7fe4d2" font-size="13" text-anchor="middle">clear</text>
+          <line x1="660" y1="295" x2="700" y2="295" stroke="#41d6c3" stroke-width="1.8" marker-end="url(#ntp-arr)"/>
+          <rect x="708" y="278" width="74" height="34" rx="7" fill="#16213d" stroke="#41d6c3" stroke-width="2"/><text x="745" y="300" fill="#41d6c3" font-size="13" font-weight="700" text-anchor="middle">…</text>
+
+          <!-- ===== FEEDBACK ARROWS: predicted token drops down and becomes input ===== -->
+          <!-- step1 blue -> step2 blue (708,87) down-left to (345,128) -->
+          <path d="M745 89 C 745 112, 420 100, 345 124" fill="none" stroke="#41d6c3" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#ntp-arr)"/>
+          <!-- step2 and -> step3 and -->
+          <path d="M745 164 C 745 186, 500 176, 427 199" fill="none" stroke="#41d6c3" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#ntp-arr)"/>
+          <!-- step3 clear -> step4 clear -->
+          <path d="M745 239 C 745 260, 580 252, 509 274" fill="none" stroke="#41d6c3" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#ntp-arr)"/>
+          <text x="600" y="120" fill="#41d6c3" font-size="11" font-style="italic">fed back as input</text>
+
+          <!-- ===== caption strip ===== -->
+          <line x1="40" y1="328" x2="840" y2="328" stroke="#28324f" stroke-width="1"/>
+          <rect x="708" y="340" width="20" height="14" rx="3" fill="#16213d" stroke="#41d6c3" stroke-width="1.6"/>
+          <text x="736" y="351" fill="#aab4cc" font-size="11.5">just predicted</text>
+          <rect x="108" y="340" width="20" height="14" rx="3" fill="#1b274a" stroke="#28324f"/>
+          <text x="136" y="351" fill="#aab4cc" font-size="11.5">existing context — appended each step, then fed back in to generate the next token.</text>
+        </svg>
+      </div>
+      <figcaption>Autoregression, unrolled: at each step the model predicts one token (teal), which is appended and fed back in — so the input sequence grows by one token every step. The same model runs again and again until the text is complete.</figcaption>
+    </figure>
+
+    <div class="callout note">
+      <div class="tag">Two limits worth remembering</div>
+      <p><strong>Context window:</strong> a model can only "see" a fixed number of tokens at once — everything outside that window is invisible. <strong>Knowledge cutoff:</strong> a model only knows what was in its training data, frozen at a point in time. It has no built-in awareness of today's news, your private documents, or live data. RAG (Section 4) and tools (Section 5) exist largely to overcome these two limits.</p>
+    </div>
+
+    <h3 id="s1-hall">Why do they hallucinate?</h3>
+    <p>A <strong>hallucination</strong> is when a model produces text that is fluent and confident but factually wrong or unsupported. This is not a random bug — it is a direct consequence of how LLMs work. Because the model's job is to generate <em>plausible</em> next tokens, it will happily fabricate a plausible-sounding citation, statistic, or API that never existed, because that fabrication is statistically likely text.<sup class="cite"><a href="#ref6">[6]</a></sup></p>
+
+    <p>Researchers categorize and explain hallucination in several ways:</p>
+    <ul>
+      <li><strong>It optimizes for plausibility, not truth.</strong> The model has no internal "fact checker"; nothing forces a generated statement to be grounded in reality.<sup class="cite"><a href="#ref7">[7]</a></sup></li>
+      <li><strong>Gaps and noise in training data.</strong> If knowledge is missing, outdated, or contradictory in the training set, the model fills the gap with a guess.<sup class="cite"><a href="#ref6">[6]</a></sup></li>
+      <li><strong>Training and evaluation reward confident guessing.</strong> Recent work argues that standard training/evaluation procedures effectively reward the model for guessing rather than saying "I don't know."<sup class="cite"><a href="#ref8">[8]</a></sup></li>
+    </ul>
+
+    <div class="callout warn">
+      <div class="tag">Why this matters for everything ahead</div>
+      <p>Hallucination is the central problem that motivates the rest of this tutorial. <strong>RAG</strong> reduces it by grounding the model in retrieved facts. <strong>Agents</strong> reduce it further by letting the model verify its work with real tools instead of guessing. Keep this thread in mind as you read on.</p>
+    </div>
+
+    <p class="src-line">Sources for this section: Attention Is All You Need <a href="#ref1">[1]</a>, GPT-3 <a href="#ref2">[2]</a>, Scaling Laws <a href="#ref3">[3]</a>, InstructGPT <a href="#ref4">[4]</a>, BPE <a href="#ref5">[5]</a>, Hallucination surveys <a href="#ref6">[6]</a><a href="#ref7">[7]</a>, OpenAI/Anthropic on hallucination <a href="#ref8">[8]</a><a href="#ref9">[9]</a>.</p>
+  </section>
+
+  <!-- ===================== SECTION 2 · EMBEDDINGS ===================== -->
+  <section class="chapter" id="emb">
+    <span class="sec-num">Section 03</span>
+    <h2>Embeddings, Explained Simply</h2>
+    <p class="section-intro">A computer can't read. So how can it possibly know that <em>"happy"</em> and <em>"joyful"</em> mean almost the same thing, while <em>"happy"</em> and <em>"brick"</em> have nothing to do with each other? The answer is one of the most beautiful ideas in AI: the <strong>embedding</strong>. It's the bridge between everything in Section 2 and the RAG and agents that follow — so let's build the intuition from scratch.</p>
+
+    <div class="callout key">
+      <div class="tag">The one-sentence idea</div>
+      <p>An <strong>embedding turns a word (or sentence, or document) into a list of numbers</strong> — a set of coordinates — so that things with similar <em>meaning</em> end up close together, and a computer can finally measure "how alike are these two ideas?"</p>
+    </div>
+
+    <h3 id="emb-map">Think of it as a giant map of meaning</h3>
+    <p>Imagine an enormous map. Instead of cities, every <strong>word</strong> gets its own pin. Here's the rule for placing pins: <strong>words that mean similar things go close together; unrelated words go far apart.</strong> So <em>cat</em>, <em>kitten</em>, and <em>dog</em> cluster in one neighborhood; <em>apple</em>, <em>banana</em>, and <em>grape</em> sit together in another; and <em>king</em> and <em>queen</em> live near each other somewhere else entirely.</p>
+
+    <p>Nobody draws this map by hand. The model figures out where each pin goes by <strong>reading a mountain of text and noticing which words keep similar company</strong>. As the linguist J. R. Firth put it in 1957, <em>"You shall know a word by the company it keeps."</em><sup class="cite"><a href="#ref39">[39]</a></sup> If two words show up in the same kinds of sentences ("I fed the ___," "the ___ purred"), the model learns they belong near each other. This is exactly how the famous <strong>word2vec</strong> and <strong>GloVe</strong> systems learned their maps.<sup class="cite"><a href="#ref35">[35]</a><a href="#ref37">[37]</a></sup></p>
+
+    <figure>
+      <div class="diagram">
+        <svg viewBox="0 0 860 430" role="img" aria-label="A simplified 2-D map of word meanings">
+          <defs>
+            <marker id="emb-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#ffb454"/></marker>
+            <marker id="emb-arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#41d6c3"/></marker>
+          </defs>
+          <!-- frame -->
+          <rect x="20" y="20" width="820" height="390" rx="14" fill="#0e1426" stroke="#28324f"/>
+          <text x="40" y="46" fill="#76829e" font-size="12" font-style="italic">A "meaning map" — real ones have hundreds of dimensions; here we flatten it to 2-D for intuition.</text>
+
+          <!-- faint grid -->
+          <g stroke="#1a2440" stroke-width="1">
+            <line x1="20" y1="120" x2="840" y2="120"/><line x1="20" y1="215" x2="840" y2="215"/><line x1="20" y1="310" x2="840" y2="310"/>
+            <line x1="225" y1="20" x2="225" y2="410"/><line x1="430" y1="20" x2="430" y2="410"/><line x1="635" y1="20" x2="635" y2="410"/>
+          </g>
+
+          <!-- ANIMALS cluster (top-left) -->
+          <ellipse cx="150" cy="120" rx="100" ry="62" fill="rgba(110,168,254,.07)" stroke="#2b3a63"/>
+          <text x="150" y="70" fill="#6ea8fe" font-size="12" font-weight="700" text-anchor="middle">ANIMALS</text>
+          <circle cx="120" cy="110" r="5" fill="#6ea8fe"/><text x="130" y="114" fill="#cdd6f4" font-size="12.5">cat</text>
+          <circle cx="180" cy="98" r="5" fill="#6ea8fe"/><text x="190" y="102" fill="#cdd6f4" font-size="12.5">kitten</text>
+          <circle cx="110" cy="150" r="5" fill="#6ea8fe"/><text x="120" y="154" fill="#cdd6f4" font-size="12.5">dog</text>
+          <circle cx="178" cy="150" r="5" fill="#6ea8fe"/><text x="188" y="154" fill="#cdd6f4" font-size="12.5">puppy</text>
+
+          <!-- FRUITS cluster (top-right) -->
+          <ellipse cx="700" cy="120" rx="100" ry="62" fill="rgba(95,211,141,.07)" stroke="#27553b"/>
+          <text x="700" y="70" fill="#5fd38d" font-size="12" font-weight="700" text-anchor="middle">FRUITS</text>
+          <circle cx="660" cy="108" r="5" fill="#5fd38d"/><text x="670" y="112" fill="#cdd6f4" font-size="12.5">apple</text>
+          <circle cx="730" cy="98" r="5" fill="#5fd38d"/><text x="740" y="102" fill="#cdd6f4" font-size="12.5">banana</text>
+          <circle cx="690" cy="152" r="5" fill="#5fd38d"/><text x="700" y="156" fill="#cdd6f4" font-size="12.5">grape</text>
+
+          <!-- ROYALTY parallelogram (bottom-center) -->
+          <text x="520" y="252" fill="#8b7bff" font-size="12" font-weight="700" text-anchor="middle">ROYALTY &amp; GENDER</text>
+          <circle cx="440" cy="350" r="5" fill="#c9b8ff"/><text x="406" y="354" fill="#cdd6f4" font-size="12.5" text-anchor="end">man</text>
+          <circle cx="440" cy="280" r="5" fill="#c9b8ff"/><text x="406" y="284" fill="#cdd6f4" font-size="12.5" text-anchor="end">woman</text>
+          <circle cx="620" cy="320" r="5" fill="#c9b8ff"/><text x="630" y="324" fill="#cdd6f4" font-size="12.5">king</text>
+          <circle cx="620" cy="280" r="5" fill="#c9b8ff"/><text x="630" y="284" fill="#cdd6f4" font-size="12.5">queen</text>
+
+          <!-- vectors: royalty direction (amber) -->
+          <line x1="446" y1="348" x2="614" y2="322" stroke="#ffb454" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#emb-arr)"/>
+          <line x1="446" y1="280" x2="614" y2="280" stroke="#ffb454" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#emb-arr)"/>
+          <text x="530" y="306" fill="#ffb454" font-size="10.5" font-style="italic" text-anchor="middle">+ "royalty"</text>
+
+          <!-- gender direction (teal) -->
+          <line x1="440" y1="344" x2="440" y2="288" stroke="#41d6c3" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#emb-arr2)"/>
+          <line x1="620" y1="314" x2="620" y2="288" stroke="#41d6c3" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#emb-arr2)"/>
+          <text x="395" y="318" fill="#41d6c3" font-size="10.5" font-style="italic" text-anchor="end">"gender"</text>
+        </svg>
+      </div>
+      <figcaption>Similar meanings cluster together. Notice the royalty group forms a parallelogram: the arrow from <em>man → king</em> is the same as <em>woman → queen</em> ("add royalty"), and <em>man → woman</em> matches <em>king → queen</em> ("change gender"). Directions on the map carry meaning.</figcaption>
+    </figure>
+
+    <h3 id="emb-math">An embedding is just the coordinates — and you can do math with meaning</h3>
+    <p>On a real-world map, a pin's location is two numbers: how far east, how far north. An <strong>embedding is the same idea</strong> — a list of numbers giving a word's position on the meaning map. The only twist is that the meaning map needs <em>many</em> directions (one for "is it an animal?", one for "is it royal?", one for "is it positive or negative?", and so on), so a real embedding isn't 2 numbers — it's often <strong>hundreds or thousands</strong> of them. We just can't draw that, so we flatten it to 2-D to picture it.</p>
+
+    <p>Here's the part that feels like magic. Because words are now numbers, you can literally do <strong>arithmetic with meaning</strong>. The result that stunned researchers in 2013:</p>
+
+    <div class="callout note">
+      <div class="tag">Meaning, as an equation</div>
+      <p style="font-family:var(--mono); font-size:16px; color:var(--ink); text-align:center; margin:6px 0;">king − man + woman ≈ queen</p>
+      <p>Start at <em>king</em>, subtract the idea of <em>man</em>, add the idea of <em>woman</em> — and you land right next to <em>queen</em>. The model was never told this. It fell out of the map it learned on its own. This is the look-up that <strong>word2vec</strong>'s authors documented.<sup class="cite"><a href="#ref36">[36]</a></sup></p>
+    </div>
+
+    <h4>How a computer measures "are these alike?"</h4>
+    <p>Once everything is a point in space, similarity becomes simple geometry: <strong>two words are alike if their pins point in nearly the same direction from the center.</strong> Computers measure the angle between two embeddings (called <em>cosine similarity</em>) — a small angle means very similar, a wide angle means unrelated. That single number is the workhorse behind search, recommendations, and RAG.</p>
+
+    <pre><code><span class="c-com"># Words become vectors; "closeness" = similar meaning</span>
+embed(<span class="c-str">"happy"</span>)  <span class="c-com"># → [0.21, -0.04, 0.88, ...]  (hundreds of numbers)</span>
+embed(<span class="c-str">"joyful"</span>) <span class="c-com"># → [0.19, -0.02, 0.85, ...]  ← almost the same direction</span>
+embed(<span class="c-str">"brick"</span>)  <span class="c-com"># → [-0.77, 0.40, 0.05, ...]  ← points somewhere else entirely</span>
+
+similarity(<span class="c-str">"happy"</span>, <span class="c-str">"joyful"</span>)  <span class="c-com"># ≈ 0.94  (very close)</span>
+similarity(<span class="c-str">"happy"</span>, <span class="c-str">"brick"</span>)   <span class="c-com"># ≈ 0.05  (basically unrelated)</span></code></pre>
+
+    <h3 id="emb-why">Why embeddings matter (and where we use them next)</h3>
+    <p>It's not just single words. We can hand a whole <strong>sentence or document</strong> to an embedding model and get one set of coordinates that captures its overall meaning — that's what <strong>Sentence-BERT</strong> made practical.<sup class="cite"><a href="#ref38">[38]</a></sup> That unlocks a superpower: to find text that <em>means</em> the same thing as your question — even if it uses completely different words — you just look for the nearest pins on the map.</p>
+
+    <div class="grid cols-3">
+      <div class="card"><h4>🔍 Semantic search</h4><p>Find results by meaning, not exact keywords. "How do I reset my password?" matches "account recovery steps."</p></div>
+      <div class="card"><h4>📚 RAG</h4><p>The engine of the next section: embed your question, fetch the nearest document chunks, ground the answer in them.</p></div>
+      <div class="card"><h4>🧠 Agent memory</h4><p>Store past facts as embeddings so an agent can later recall the relevant ones — long-term memory (Section 5).</p></div>
+    </div>
+
+    <div class="callout key">
+      <div class="tag">Carry this forward</div>
+      <p>Everything you're about to read in <strong>RAG</strong> and <strong>agent memory</strong> is built on this one idea: <em>turn meaning into coordinates, then find what's nearby.</em> If embeddings click for you, the rest of this tutorial will feel like a natural next step.</p>
+    </div>
+
+    <p class="src-line">Sources for this section: word2vec <a href="#ref35">[35]</a>, word analogies / king-queen <a href="#ref36">[36]</a>, GloVe <a href="#ref37">[37]</a>, Sentence-BERT <a href="#ref38">[38]</a>, distributional hypothesis (Firth) <a href="#ref39">[39]</a>.</p>
+  </section>
+
+  <!-- ===================== SECTION 3 · RAG ===================== -->
+  <section class="chapter" id="s2">
+    <span class="sec-num">Section 04</span>
+    <h2>The Art of Grounding the LLM — Retrieval-Augmented Generation</h2>
+    <p class="section-intro">If an LLM hallucinates because it relies only on frozen, parametric memory, the fix is intuitive: give it the right facts at the moment it answers. That is exactly what <strong>Retrieval-Augmented Generation (RAG)</strong> does.</p>
+
+    <h3 id="s2-what">An overview of RAG</h3>
+    <p><strong>Retrieval-Augmented Generation</strong> was introduced by Lewis et al. in 2020. The idea: instead of relying solely on what the model memorized during training, <strong>retrieve relevant documents from an external knowledge source at query time</strong> and feed them into the prompt as context. The model then generates its answer <em>grounded</em> in that retrieved evidence.<sup class="cite"><a href="#ref10">[10]</a></sup></p>
+
+    <div class="callout key">
+      <div class="tag">The one-sentence definition</div>
+      <p>RAG = <strong>"open-book exam" for an LLM.</strong> Rather than answering from memory alone (closed-book), the model is handed the relevant pages first, then asked to answer using them.</p>
+    </div>
+
+    <h3>How does RAG reduce hallucination and ground the model?</h3>
+    <p>Grounding works because the answer is now <em>conditioned on supplied evidence</em> rather than generated from the model's parametric guesses alone. Empirically, augmenting generation with retrieval has been shown to <strong>measurably reduce hallucination</strong> — Shuster et al. demonstrated that retrieval augmentation reduces hallucination in knowledge-grounded conversation while improving answer accuracy.<sup class="cite"><a href="#ref13">[13]</a></sup> Grounding gives three concrete benefits:</p>
+    <div class="grid cols-3">
+      <div class="card"><h4>🎯 Accuracy</h4><p>Answers are anchored to real, retrievable source text instead of statistical guesses.</p></div>
+      <div class="card"><h4>🔗 Attribution</h4><p>You can show <em>which</em> document a claim came from — enabling citations and trust.</p></div>
+      <div class="card"><h4>🔄 Freshness</h4><p>Update the knowledge base, not the model. Private and real-time data become usable without retraining.</p></div>
+    </div>
+
+    <h3 id="s2-pipe">How does RAG work? The ingestion → retrieval → generation pipeline</h3>
+    <p>A RAG system has two phases. <strong>Ingestion</strong> happens ahead of time (offline): you prepare your knowledge base. <strong>Retrieval &amp; generation</strong> happen live (online): each time a user asks a question.</p>
+
+    <figure>
+      <div class="diagram">
+        <svg viewBox="0 0 900 470" role="img" aria-label="RAG pipeline: ingestion, retrieval and generation">
+          <defs>
+            <marker id="a2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8b7bff"/></marker>
+            <marker id="a3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#41d6c3"/></marker>
+          </defs>
+
+          <!-- INGESTION lane -->
+          <rect x="14" y="14" width="872" height="190" rx="14" fill="rgba(139,123,255,.06)" stroke="#2a2350"/>
+          <text x="34" y="40" fill="#8b7bff" font-size="13" font-weight="700" letter-spacing="1.5">① INGESTION  ·  offline, done once</text>
+
+          <rect x="34" y="70" width="120" height="64" rx="10" fill="#1b274a" stroke="#28324f"/><text x="94" y="98" fill="#e7ecf5" font-size="13" text-anchor="middle">Documents</text><text x="94" y="116" fill="#76829e" font-size="11" text-anchor="middle">PDFs, wikis, DBs</text>
+          <rect x="200" y="70" width="120" height="64" rx="10" fill="#1b274a" stroke="#28324f"/><text x="260" y="98" fill="#e7ecf5" font-size="13" text-anchor="middle">Chunking</text><text x="260" y="116" fill="#76829e" font-size="11" text-anchor="middle">split into passages</text>
+          <rect x="366" y="70" width="120" height="64" rx="10" fill="#1b274a" stroke="#28324f"/><text x="426" y="98" fill="#e7ecf5" font-size="13" text-anchor="middle">Embedding</text><text x="426" y="116" fill="#76829e" font-size="11" text-anchor="middle">text → vectors</text>
+          <rect x="532" y="70" width="150" height="64" rx="10" fill="#16213d" stroke="#41d6c3"/><text x="607" y="92" fill="#41d6c3" font-size="13" font-weight="700" text-anchor="middle">Vector Database</text><text x="607" y="112" fill="#aab4cc" font-size="11" text-anchor="middle">indexed for fast</text><text x="607" y="126" fill="#aab4cc" font-size="11" text-anchor="middle">similarity search</text>
+
+          <line x1="156" y1="102" x2="196" y2="102" stroke="#8b7bff" stroke-width="2" marker-end="url(#a2)"/>
+          <line x1="322" y1="102" x2="362" y2="102" stroke="#8b7bff" stroke-width="2" marker-end="url(#a2)"/>
+          <line x1="488" y1="102" x2="528" y2="102" stroke="#8b7bff" stroke-width="2" marker-end="url(#a2)"/>
+
+          <!-- RETRIEVAL + GENERATION lane -->
+          <rect x="14" y="224" width="872" height="232" rx="14" fill="rgba(65,214,195,.05)" stroke="#1f3f3a"/>
+          <text x="34" y="250" fill="#41d6c3" font-size="13" font-weight="700" letter-spacing="1.5">② RETRIEVAL &amp; GENERATION  ·  online, per query</text>
+
+          <rect x="34" y="280" width="120" height="60" rx="10" fill="#1b274a" stroke="#28324f"/><text x="94" y="306" fill="#e7ecf5" font-size="13" text-anchor="middle">User query</text><text x="94" y="324" fill="#76829e" font-size="11" text-anchor="middle">"How do I…?"</text>
+          <rect x="34" y="368" width="120" height="60" rx="10" fill="#1b274a" stroke="#28324f"/><text x="94" y="394" fill="#e7ecf5" font-size="13" text-anchor="middle">Embed query</text><text x="94" y="412" fill="#76829e" font-size="11" text-anchor="middle">same model</text>
+
+          <rect x="200" y="324" width="150" height="60" rx="10" fill="#16213d" stroke="#41d6c3"/><text x="275" y="350" fill="#41d6c3" font-size="13" font-weight="700" text-anchor="middle">Similarity search</text><text x="275" y="368" fill="#aab4cc" font-size="11" text-anchor="middle">top-k nearest chunks</text>
+
+          <rect x="396" y="324" width="150" height="60" rx="10" fill="#1b274a" stroke="#28324f"/><text x="471" y="350" fill="#e7ecf5" font-size="13" text-anchor="middle">Augmented prompt</text><text x="471" y="368" fill="#76829e" font-size="11" text-anchor="middle">query + retrieved text</text>
+
+          <rect x="592" y="316" width="130" height="76" rx="10" fill="#1b1233" stroke="#8b7bff"/><text x="657" y="346" fill="#c9b8ff" font-size="14" font-weight="700" text-anchor="middle">LLM</text><text x="657" y="366" fill="#aab4cc" font-size="11" text-anchor="middle">generates grounded</text><text x="657" y="380" fill="#aab4cc" font-size="11" text-anchor="middle">answer</text>
+
+          <rect x="762" y="324" width="110" height="60" rx="10" fill="#16321f" stroke="#5fd38d"/><text x="817" y="350" fill="#9ff0bd" font-size="13" font-weight="700" text-anchor="middle">Answer</text><text x="817" y="368" fill="#aab4cc" font-size="11" text-anchor="middle">+ citations</text>
+
+          <!-- arrows -->
+          <line x1="94" y1="340" x2="94" y2="366" stroke="#41d6c3" stroke-width="2" marker-end="url(#a3)"/>
+          <line x1="156" y1="398" x2="196" y2="372" stroke="#41d6c3" stroke-width="2" marker-end="url(#a3)"/>
+          <line x1="350" y1="354" x2="392" y2="354" stroke="#41d6c3" stroke-width="2" marker-end="url(#a3)"/>
+          <line x1="546" y1="354" x2="588" y2="354" stroke="#41d6c3" stroke-width="2" marker-end="url(#a3)"/>
+          <line x1="722" y1="354" x2="758" y2="354" stroke="#41d6c3" stroke-width="2" marker-end="url(#a3)"/>
+          <!-- vector DB feeds retrieval -->
+          <path d="M607 134 C 607 250, 320 250, 290 322" fill="none" stroke="#41d6c3" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#a3)"/>
+          <text x="430" y="232" fill="#41d6c3" font-size="10" opacity="0">idx</text>
+        </svg>
+      </div>
+      <figcaption>The complete RAG pipeline. Ingestion (purple) builds the vector index once; retrieval &amp; generation (teal) run on every query. The vector database is the bridge between the two phases.</figcaption>
+    </figure>
+
+    <h4>The mechanics: embeddings &amp; vector search</h4>
+    <p>The engine of retrieval is the <strong>embedding</strong>: a model converts each chunk of text into a vector so that semantically similar text lands near it in vector space. <strong>Dense Passage Retrieval</strong> showed that learned dense embeddings dramatically outperform old keyword search for question answering.<sup class="cite"><a href="#ref11">[11]</a></sup> At query time we embed the question the same way and find the nearest chunks. Because comparing against millions of vectors exactly is slow, vector databases use <strong>Approximate Nearest Neighbor (ANN)</strong> algorithms such as HNSW graphs to find the closest matches in milliseconds.<sup class="cite"><a href="#ref12">[12]</a></sup></p>
+
+    <pre><code><span class="c-com"># A minimal RAG loop in pseudocode</span>
+<span class="c-com"># --- Ingestion (run once) ---</span>
+chunks = split_into_chunks(documents)
+vectors = embed(chunks)
+index = VectorDB(vectors, metadata=chunks)
+
+<span class="c-com"># --- Per query (run live) ---</span>
+<span class="c-kw">def</span> <span class="c-fn">answer</span>(question):
+    q_vec   = embed(question)
+    top_k   = index.search(q_vec, k=<span class="c-num">5</span>)        <span class="c-com"># nearest chunks</span>
+    context = <span class="c-str">"\n\n"</span>.join(top_k)
+    prompt  = <span class="c-str">f"Use ONLY this context:\n{context}\n\nQ: {question}"</span>
+    <span class="c-kw">return</span> llm(prompt)                       <span class="c-com"># grounded generation</span></code></pre>
+
+    <h3 id="s2-chunk">Chunking &amp; retrieval strategies</h3>
+    <p>RAG quality lives or dies on retrieval quality, and retrieval quality starts with <strong>chunking</strong> — how you split documents before embedding. Chunks that are too big dilute relevance; too small and they lose context.</p>
+
+    <h4>Chunking strategies</h4>
+    <table>
+      <thead><tr><th>Strategy</th><th>How it works</th><th>Best for</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Fixed-size</strong></td><td>Split every N tokens/characters, often with overlap.</td><td>Simple, uniform text; a fast baseline.</td></tr>
+        <tr><td><strong>Recursive</strong></td><td>Split on a hierarchy of separators (paragraphs → sentences → words) to keep natural units intact. The standard LangChain <code>RecursiveCharacterTextSplitter</code>.<sup class="cite"><a href="#ref14">[14]</a></sup></td><td>Most prose; the sensible default.</td></tr>
+        <tr><td><strong>Semantic</strong></td><td>Split where the topic shifts, detected via embedding similarity between sentences.</td><td>Documents with mixed topics.</td></tr>
+        <tr><td><strong>Contextual</strong></td><td>Prepend a short, LLM-generated summary of the document to each chunk before embedding. Anthropic's <em>Contextual Retrieval</em> shows this sharply cuts retrieval failures.<sup class="cite"><a href="#ref15">[15]</a></sup></td><td>Large corpora where chunks lose context.</td></tr>
+      </tbody>
+    </table>
+
+    <h4>Retrieval strategies</h4>
+    <div class="grid cols-3">
+      <div class="card"><h4>Dense (semantic)</h4><p>Match by <em>meaning</em> using vector similarity. Great for paraphrases and concepts, but can miss exact keywords, codes, or names.<sup class="cite"><a href="#ref11">[11]</a></sup></p></div>
+      <div class="card"><h4>Hybrid search</h4><p>Combine dense vectors with classic keyword scoring (<strong>BM25</strong>) to get both meaning and exact-term matching — the current best-practice default.<sup class="cite"><a href="#ref16">[16]</a></sup></p></div>
+      <div class="card"><h4>Re-ranking</h4><p>Retrieve a broad set, then use a more precise cross-encoder model (e.g. BERT re-ranker) to re-order the top results for relevance before sending to the LLM.<sup class="cite"><a href="#ref17">[17]</a></sup></p></div>
+    </div>
+
+    <div class="callout note">
+      <div class="tag">A common production pattern</div>
+      <p><strong>Hybrid retrieve → re-rank → contextual chunks.</strong> Cast a wide net with BM25 + dense search, tighten precision with a re-ranker, and ensure each chunk carries enough context to stand alone. This stack addresses the most common cause of RAG failure: the right answer was in the knowledge base but never made it into the prompt.</p>
+    </div>
+
+    <p class="src-line">Sources for this section: RAG <a href="#ref10">[10]</a>, Dense Passage Retrieval <a href="#ref11">[11]</a>, HNSW/ANN <a href="#ref12">[12]</a>, retrieval reduces hallucination <a href="#ref13">[13]</a>, recursive chunking <a href="#ref14">[14]</a>, Contextual Retrieval <a href="#ref15">[15]</a>, BM25 <a href="#ref16">[16]</a>, re-ranking <a href="#ref17">[17]</a>.</p>
+  </section>
+
+  <!-- ===================== SECTION 3 ===================== -->
+  <section class="chapter" id="s3">
+    <span class="sec-num">Section 05</span>
+    <h2>The Birth of Agents</h2>
+    <p class="section-intro">RAG gives an LLM better knowledge, but it still only does one thing: produce text in a single shot. An <strong>agent</strong> breaks that limit. It uses the LLM as a reasoning engine inside a loop — thinking, acting in the world, observing results, and trying again until a goal is met.</p>
+
+    <h3 id="s3-what">What is an agent?</h3>
+    <p>An agent is best understood through a now-canonical formula. As Lilian Weng describes it, an LLM-powered autonomous agent is built from the <strong>LLM as the core "brain,"</strong> surrounded by three faculties that give it agency: <strong>planning, memory, and tool use</strong>.<sup class="cite"><a href="#ref18">[18]</a></sup></p>
+
+    <figure>
+      <div class="diagram">
+        <svg viewBox="0 0 720 420" role="img" aria-label="Anatomy of an agent">
+          <!-- center brain -->
+          <circle cx="360" cy="210" r="78" fill="#1b1233" stroke="#8b7bff" stroke-width="2"/>
+          <text x="360" y="200" fill="#c9b8ff" font-size="20" font-weight="800" text-anchor="middle">LLM</text>
+          <text x="360" y="224" fill="#aab4cc" font-size="13" text-anchor="middle">reasoning core</text>
+
+          <!-- planning -->
+          <rect x="280" y="20" width="160" height="74" rx="12" fill="#16213d" stroke="#6ea8fe"/>
+          <text x="360" y="50" fill="#6ea8fe" font-size="15" font-weight="700" text-anchor="middle">🧭 Planning</text>
+          <text x="360" y="72" fill="#aab4cc" font-size="11.5" text-anchor="middle">decompose goals,</text>
+          <text x="360" y="86" fill="#aab4cc" font-size="11.5" text-anchor="middle">reason step-by-step, reflect</text>
+
+          <!-- memory -->
+          <rect x="20" y="173" width="170" height="74" rx="12" fill="#16321f" stroke="#5fd38d"/>
+          <text x="105" y="203" fill="#9ff0bd" font-size="15" font-weight="700" text-anchor="middle">🧠 Memory</text>
+          <text x="105" y="225" fill="#aab4cc" font-size="11.5" text-anchor="middle">short-term (context)</text>
+          <text x="105" y="239" fill="#aab4cc" font-size="11.5" text-anchor="middle">long-term (vector store)</text>
+
+          <!-- tools -->
+          <rect x="530" y="173" width="170" height="74" rx="12" fill="#3a2418" stroke="#ffb454"/>
+          <text x="615" y="203" fill="#ffd29a" font-size="15" font-weight="700" text-anchor="middle">🛠️ Tools</text>
+          <text x="615" y="225" fill="#aab4cc" font-size="11.5" text-anchor="middle">search, code, APIs,</text>
+          <text x="615" y="239" fill="#aab4cc" font-size="11.5" text-anchor="middle">databases, RAG</text>
+
+          <!-- environment -->
+          <rect x="270" y="330" width="180" height="64" rx="12" fill="#1b274a" stroke="#28324f"/>
+          <text x="360" y="358" fill="#e7ecf5" font-size="14" font-weight="700" text-anchor="middle">🌍 Environment</text>
+          <text x="360" y="378" fill="#76829e" font-size="11.5" text-anchor="middle">the world it acts upon</text>
+
+          <!-- connectors -->
+          <line x1="360" y1="94" x2="360" y2="132" stroke="#6ea8fe" stroke-width="2"/>
+          <line x1="190" y1="210" x2="282" y2="210" stroke="#5fd38d" stroke-width="2"/>
+          <line x1="438" y1="210" x2="530" y2="210" stroke="#ffb454" stroke-width="2"/>
+          <line x1="360" y1="288" x2="360" y2="330" stroke="#28324f" stroke-width="2" stroke-dasharray="5 4"/>
+        </svg>
+      </div>
+      <figcaption>The anatomy of an agent: an LLM brain augmented with planning, memory, and tools, acting on an environment.<sup class="cite"><a href="#ref18">[18]</a></sup></figcaption>
+    </figure>
+
+    <div class="grid cols-3">
+      <div class="card"><h4>🧭 Planning</h4><p>Break a big goal into steps and reason about how to achieve them. <strong>Chain-of-Thought</strong> prompting elicits step-by-step reasoning,<sup class="cite"><a href="#ref20">[20]</a></sup> and <strong>Reflexion</strong> lets an agent critique and improve its own attempts.<sup class="cite"><a href="#ref21">[21]</a></sup></p></div>
+      <div class="card"><h4>🧠 Memory</h4><p><strong>Short-term</strong> memory is the context window (the current conversation). <strong>Long-term</strong> memory stores facts in an external vector store the agent can retrieve later — RAG, used as memory.<sup class="cite"><a href="#ref18">[18]</a></sup></p></div>
+      <div class="card"><h4>🛠️ Tools</h4><p>Tools let the model <em>act</em>: run code, query a database, call an API, search the web. <strong>Function calling</strong> and <strong>Toolformer</strong> showed models can learn to invoke tools reliably.<sup class="cite"><a href="#ref19">[19]</a><a href="#ref23">[23]</a></sup></p></div>
+    </div>
+
+    <h3 id="s3-loop">How agents augment the LLM — the ReAct loop</h3>
+    <p>The breakthrough that made agents practical is <strong>ReAct</strong> ("Reasoning + Acting"). Instead of answering in one shot, the model interleaves <strong>Thought → Action → Observation</strong> steps: it reasons about what to do, takes an action with a tool, observes the real result, and repeats until done. This grounds its reasoning in real feedback instead of pure speculation.<sup class="cite"><a href="#ref22">[22]</a></sup></p>
+
+    <figure>
+      <div class="diagram">
+        <svg viewBox="0 0 760 300" role="img" aria-label="The ReAct agent loop">
+          <defs><marker id="a4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6ea8fe"/></marker></defs>
+          <rect x="300" y="20" width="160" height="56" rx="10" fill="#1b1233" stroke="#8b7bff"/><text x="380" y="46" fill="#c9b8ff" font-size="14" font-weight="700" text-anchor="middle">💭 Thought</text><text x="380" y="64" fill="#aab4cc" font-size="11" text-anchor="middle">"I should search for X"</text>
+
+          <rect x="560" y="120" width="160" height="56" rx="10" fill="#3a2418" stroke="#ffb454"/><text x="640" y="146" fill="#ffd29a" font-size="14" font-weight="700" text-anchor="middle">⚡ Action</text><text x="640" y="164" fill="#aab4cc" font-size="11" text-anchor="middle">call a tool</text>
+
+          <rect x="300" y="220" width="160" height="56" rx="10" fill="#16321f" stroke="#5fd38d"/><text x="380" y="246" fill="#9ff0bd" font-size="14" font-weight="700" text-anchor="middle">👁️ Observation</text><text x="380" y="264" fill="#aab4cc" font-size="11" text-anchor="middle">real result from world</text>
+
+          <rect x="40" y="120" width="160" height="56" rx="10" fill="#16213d" stroke="#6ea8fe"/><text x="120" y="146" fill="#6ea8fe" font-size="14" font-weight="700" text-anchor="middle">✓ Done?</text><text x="120" y="164" fill="#aab4cc" font-size="11" text-anchor="middle">answer · or loop again</text>
+
+          <!-- circular arrows -->
+          <path d="M460 50 C 560 55, 640 80, 640 116" fill="none" stroke="#6ea8fe" stroke-width="2" marker-end="url(#a4)"/>
+          <path d="M620 176 C 600 230, 480 248, 464 248" fill="none" stroke="#6ea8fe" stroke-width="2" marker-end="url(#a4)"/>
+          <path d="M300 248 C 180 248, 130 210, 122 178" fill="none" stroke="#6ea8fe" stroke-width="2" marker-end="url(#a4)"/>
+          <path d="M150 120 C 170 70, 250 50, 296 48" fill="none" stroke="#6ea8fe" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#a4)"/>
+        </svg>
+      </div>
+      <figcaption>The ReAct loop: the agent thinks, acts via a tool, observes the real outcome, and decides whether to finish or continue.<sup class="cite"><a href="#ref22">[22]</a></sup></figcaption>
+    </figure>
+
+    <h3>What can agents do that plain LLMs cannot?</h3>
+    <table>
+      <thead><tr><th>Capability</th><th>Plain LLM</th><th>Agent</th></tr></thead>
+      <tbody>
+        <tr><td>Access live / private data</td><td>❌ frozen at training cutoff</td><td>✅ calls search, APIs, databases</td></tr>
+        <tr><td>Take real actions</td><td>❌ only outputs text</td><td>✅ sends emails, edits files, runs code</td></tr>
+        <tr><td>Multi-step tasks</td><td>❌ single shot</td><td>✅ loops until the goal is reached</td></tr>
+        <tr><td>Self-correction</td><td>❌ can't see if it was wrong</td><td>✅ observes results, retries, reflects<sup class="cite"><a href="#ref21">[21]</a></sup></td></tr>
+        <tr><td>Precise computation</td><td>❌ may miscalculate</td><td>✅ delegates to a calculator/code tool</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="s3-build">How do we develop agents?</h3>
+    <p>At its heart, an agent is a loop around an LLM that can call tools. Here is the essential skeleton, stripped of any framework:</p>
+    <pre><code><span class="c-com"># The core agent loop — every framework is a wrapper around this</span>
+<span class="c-kw">def</span> <span class="c-fn">run_agent</span>(goal, tools, max_steps=<span class="c-num">10</span>):
+    history = [system_prompt(goal, tools)]
+    <span class="c-kw">for</span> step <span class="c-kw">in</span> range(max_steps):
+        decision = llm(history)                  <span class="c-com"># Thought + chosen Action</span>
+        <span class="c-kw">if</span> decision.is_final:
+            <span class="c-kw">return</span> decision.answer              <span class="c-com"># goal reached</span>
+        result = tools[decision.tool](**decision.args)   <span class="c-com"># Act</span>
+        history.append(observation(result))      <span class="c-com"># Observe, then loop</span></code></pre>
+
+    <p>In practice you rarely write the loop by hand. Mature building blocks include:</p>
+    <ul>
+      <li><strong>Tool use / function calling</strong> — the model returns structured calls your code executes (OpenAI function calling, Anthropic tool use).<sup class="cite"><a href="#ref19">[19]</a></sup></li>
+      <li><strong>The Model Context Protocol (MCP)</strong> — an open standard from Anthropic for connecting agents to tools and data sources in a uniform way, so you don't rebuild integrations per model.<sup class="cite"><a href="#ref24">[24]</a></sup></li>
+      <li><strong>Frameworks</strong> — LangGraph, AutoGen, and the OpenAI Agents SDK provide loops, memory, and orchestration out of the box (covered next).</li>
+    </ul>
+
+    <div class="callout warn">
+      <div class="tag">Design guidance from the field</div>
+      <p>Anthropic's <em>Building Effective Agents</em> stresses: <strong>start with the simplest thing that works.</strong> Many "agent" problems are solved better by a fixed workflow than by a fully autonomous loop. Add autonomy only when the task genuinely requires open-ended decision-making — it costs latency, money, and predictability.<sup class="cite"><a href="#ref25">[25]</a></sup></p>
+    </div>
+
+    <p class="src-line">Sources for this section: LLM-powered agents <a href="#ref18">[18]</a>, function calling <a href="#ref19">[19]</a>, Chain-of-Thought <a href="#ref20">[20]</a>, Reflexion <a href="#ref21">[21]</a>, ReAct <a href="#ref22">[22]</a>, Toolformer <a href="#ref23">[23]</a>, MCP <a href="#ref24">[24]</a>, Building Effective Agents <a href="#ref25">[25]</a>.</p>
+  </section>
+
+  <!-- ===================== SECTION 4 ===================== -->
+  <section class="chapter" id="s4">
+    <span class="sec-num">Section 06</span>
+    <h2>Multi-Agent Orchestration</h2>
+    <p class="section-intro">One agent is powerful; a coordinated team of agents can tackle problems too large or too varied for any single context. <strong>Orchestration</strong> is the discipline of arranging how agents — and humans — pass work between each other. The central design question is always: <em>how much autonomy do we grant, and who holds the reins?</em></p>
+
+    <h3>What is agency and multi-agent orchestration?</h3>
+    <p><strong>Agency</strong> is the degree to which the system — rather than a human — decides what to do next. <strong>Multi-agent orchestration</strong> is coordinating several specialized agents (each with its own role, prompt, and tools) toward a shared goal. A common and effective shape is the <strong>orchestrator-worker</strong> pattern: a lead agent decomposes a task and delegates subtasks to worker agents running in parallel. Anthropic reports this architecture outperformed a single agent by <strong>90%</strong> on their internal research evaluation.<sup class="cite"><a href="#ref26">[26]</a></sup></p>
+
+    <h3 id="s4-spectrum">The spectrum of autonomy — three patterns of orchestration</h3>
+    <p>Orchestration is not all-or-nothing. It sits on a spectrum from fully human-directed to largely self-directed. Your three core patterns map cleanly onto this spectrum:</p>
+
+    <figure>
+      <div class="diagram">
+        <svg viewBox="0 0 880 260" role="img" aria-label="Spectrum of orchestration autonomy">
+          <defs><linearGradient id="grad" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6ea8fe"/><stop offset="0.5" stop-color="#8b7bff"/><stop offset="1" stop-color="#ff7a90"/></linearGradient></defs>
+          <rect x="40" y="40" width="800" height="10" rx="5" fill="url(#grad)"/>
+          <text x="40" y="30" fill="#6ea8fe" font-size="12" font-weight="700">◀ Human holds the reins</text>
+          <text x="840" y="30" fill="#ff7a90" font-size="12" font-weight="700" text-anchor="end">Agent holds the reins ▶</text>
+
+          <!-- markers -->
+          <circle cx="150" cy="45" r="8" fill="#6ea8fe" stroke="#0b1020" stroke-width="2"/>
+          <circle cx="450" cy="45" r="8" fill="#8b7bff" stroke="#0b1020" stroke-width="2"/>
+          <circle cx="730" cy="45" r="8" fill="#ff7a90" stroke="#0b1020" stroke-width="2"/>
+
+          <!-- card 1 -->
+          <rect x="40" y="80" width="240" height="150" rx="12" fill="#16213d" stroke="#6ea8fe"/>
+          <text x="60" y="108" fill="#6ea8fe" font-size="14" font-weight="800">1 · Deterministic Workflow</text>
+          <text x="60" y="132" fill="#aab4cc" font-size="12">The human designs every step.</text>
+          <text x="60" y="150" fill="#aab4cc" font-size="12">The LLM fills in fixed slots.</text>
+          <text x="60" y="174" fill="#76829e" font-size="11.5">Predictable, auditable, cheap.</text>
+          <text x="60" y="192" fill="#76829e" font-size="11.5">No autonomy. Best when the</text>
+          <text x="60" y="208" fill="#76829e" font-size="11.5">path is known in advance.</text>
+
+          <!-- card 2 -->
+          <rect x="320" y="80" width="240" height="150" rx="12" fill="#1b1233" stroke="#8b7bff"/>
+          <text x="340" y="108" fill="#c9b8ff" font-size="14" font-weight="800">2 · Controlled Flow</text>
+          <text x="340" y="132" fill="#aab4cc" font-size="12">Human weaves the flow, but</text>
+          <text x="340" y="150" fill="#aab4cc" font-size="12">agents choose within branches.</text>
+          <text x="340" y="174" fill="#76829e" font-size="11.5">Routing, parallelization,</text>
+          <text x="340" y="192" fill="#76829e" font-size="11.5">orchestrator-workers. Autonomy</text>
+          <text x="340" y="208" fill="#76829e" font-size="11.5">inside human-set rails.</text>
+
+          <!-- card 3 -->
+          <rect x="600" y="80" width="240" height="150" rx="12" fill="#3a1f28" stroke="#ff7a90"/>
+          <text x="620" y="108" fill="#ffaeba" font-size="14" font-weight="800">3 · Controlled Autonomy</text>
+          <text x="620" y="132" fill="#aab4cc" font-size="12">Agents plan their own path;</text>
+          <text x="620" y="150" fill="#aab4cc" font-size="12">humans bound the sandbox.</text>
+          <text x="620" y="174" fill="#76829e" font-size="11.5">Limits live in scoped tools,</text>
+          <text x="620" y="192" fill="#76829e" font-size="11.5">prompts, permissions &amp; budgets.</text>
+          <text x="620" y="208" fill="#76829e" font-size="11.5">Most flexible, hardest to govern.</text>
+        </svg>
+      </div>
+      <figcaption>The three orchestration patterns plotted on the autonomy spectrum — control shifts from human to agent left to right, but never fully leaves human-defined boundaries.</figcaption>
+    </figure>
+
+    <div class="grid cols-1">
+      <div class="card">
+        <h4 style="color:var(--brand)">Pattern 1 — Deterministic Workflow</h4>
+        <p><strong>The human weaves the entire flow, which is deterministic.</strong> Every step and transition is fixed in code; the LLM is called at predefined points to do bounded sub-tasks (classify, extract, summarize). This corresponds to Anthropic's "workflows," where LLMs are orchestrated through <em>predefined code paths</em>. It is the right choice whenever the task is well-understood — it is predictable, testable, and easy to debug.<sup class="cite"><a href="#ref25">[25]</a></sup></p>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--brand-2)">Pattern 2 — Controlled Flow Engineering</h4>
+        <p><strong>Agents get autonomy, but in a controlled fashion woven by the human.</strong> The human designs the overall graph, but at certain nodes an LLM <em>decides</em> which branch to take, which worker to dispatch, or how many parallel paths to spawn. This covers the canonical building blocks — <em>routing</em>, <em>parallelization</em>, and <em>orchestrator-workers</em> — and is what frameworks like LangGraph are built to express.<sup class="cite"><a href="#ref25">[25]</a><a href="#ref27">[27]</a></sup></p>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--rose)">Pattern 3 — Controlled Autonomy</h4>
+        <p><strong>Agents weave their own path, but the decision boundary is still controlled — via scoped tools, prompts, and permissions.</strong> Here the agent plans dynamically (a true ReAct loop), but humans constrain the <em>sandbox</em>: which tools exist, what they're allowed to touch, budget/step limits, and approval gates for risky actions. This is the most capable and the most demanding to govern — autonomy is real, but bounded by design.<sup class="cite"><a href="#ref25">[25]</a></sup></p>
+      </div>
+    </div>
+
+    <h3 id="s4-patterns">The canonical orchestration building blocks</h3>
+    <p>Anthropic's <em>Building Effective Agents</em> catalogs five composable patterns that underlie almost every real system. They are the vocabulary every practitioner should know:<sup class="cite"><a href="#ref25">[25]</a></sup></p>
+
+    <figure>
+      <div class="diagram">
+        <svg viewBox="0 0 900 320" role="img" aria-label="Five orchestration patterns">
+          <defs><marker id="a5" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#aab4cc"/></marker></defs>
+
+          <!-- chaining -->
+          <text x="30" y="30" fill="#e7ecf5" font-size="13" font-weight="700">Prompt chaining</text>
+          <rect x="30" y="42" width="48" height="34" rx="7" fill="#1b274a" stroke="#28324f"/>
+          <rect x="98" y="42" width="48" height="34" rx="7" fill="#1b274a" stroke="#28324f"/>
+          <rect x="166" y="42" width="48" height="34" rx="7" fill="#1b274a" stroke="#28324f"/>
+          <line x1="78" y1="59" x2="96" y2="59" stroke="#aab4cc" stroke-width="1.6" marker-end="url(#a5)"/>
+          <line x1="146" y1="59" x2="164" y2="59" stroke="#aab4cc" stroke-width="1.6" marker-end="url(#a5)"/>
+
+          <!-- routing -->
+          <text x="300" y="30" fill="#e7ecf5" font-size="13" font-weight="700">Routing</text>
+          <rect x="300" y="42" width="48" height="34" rx="7" fill="#16213d" stroke="#6ea8fe"/>
+          <rect x="400" y="14" width="48" height="30" rx="7" fill="#1b274a" stroke="#28324f"/>
+          <rect x="400" y="52" width="48" height="30" rx="7" fill="#1b274a" stroke="#28324f"/>
+          <rect x="400" y="90" width="48" height="30" rx="7" fill="#1b274a" stroke="#28324f"/>
+          <line x1="348" y1="55" x2="398" y2="32" stroke="#aab4cc" stroke-width="1.6" marker-end="url(#a5)"/>
+          <line x1="348" y1="59" x2="398" y2="67" stroke="#aab4cc" stroke-width="1.6" marker-end="url(#a5)"/>
+          <line x1="348" y1="63" x2="398" y2="102" stroke="#aab4cc" stroke-width="1.6" marker-end="url(#a5)"/>
+
+          <!-- parallelization -->
+          <text x="580" y="30" fill="#e7ecf5" font-size="13" font-weight="700">Parallelization</text>
+          <rect x="580" y="52" width="44" height="30" rx="7" fill="#16213d" stroke="#6ea8fe"/>
+          <rect x="676" y="14" width="44" height="30" rx="7" fill="#1b274a" stroke="#28324f"/>
+          <rect x="676" y="52" width="44" height="30" rx="7" fill="#1b274a" stroke="#28324f"/>
+          <rect x="676" y="90" width="44" height="30" rx="7" fill="#1b274a" stroke="#28324f"/>
+          <rect x="772" y="52" width="44" height="30" rx="7" fill="#16321f" stroke="#5fd38d"/>
+          <line x1="624" y1="63" x2="674" y2="32" stroke="#aab4cc" stroke-width="1.4" marker-end="url(#a5)"/>
+          <line x1="624" y1="67" x2="674" y2="67" stroke="#aab4cc" stroke-width="1.4" marker-end="url(#a5)"/>
+          <line x1="624" y1="71" x2="674" y2="102" stroke="#aab4cc" stroke-width="1.4" marker-end="url(#a5)"/>
+          <line x1="720" y1="30" x2="770" y2="60" stroke="#aab4cc" stroke-width="1.4" marker-end="url(#a5)"/>
+          <line x1="720" y1="67" x2="770" y2="67" stroke="#aab4cc" stroke-width="1.4" marker-end="url(#a5)"/>
+          <line x1="720" y1="104" x2="770" y2="74" stroke="#aab4cc" stroke-width="1.4" marker-end="url(#a5)"/>
+
+          <!-- orchestrator-workers -->
+          <text x="30" y="180" fill="#e7ecf5" font-size="13" font-weight="700">Orchestrator-workers</text>
+          <rect x="120" y="195" width="70" height="36" rx="8" fill="#1b1233" stroke="#8b7bff"/><text x="155" y="218" fill="#c9b8ff" font-size="11" text-anchor="middle">lead</text>
+          <rect x="40" y="262" width="60" height="32" rx="7" fill="#1b274a" stroke="#28324f"/><text x="70" y="283" fill="#aab4cc" font-size="10" text-anchor="middle">worker</text>
+          <rect x="125" y="262" width="60" height="32" rx="7" fill="#1b274a" stroke="#28324f"/><text x="155" y="283" fill="#aab4cc" font-size="10" text-anchor="middle">worker</text>
+          <rect x="210" y="262" width="60" height="32" rx="7" fill="#1b274a" stroke="#28324f"/><text x="240" y="283" fill="#aab4cc" font-size="10" text-anchor="middle">worker</text>
+          <line x1="150" y1="231" x2="75" y2="260" stroke="#aab4cc" stroke-width="1.4" marker-end="url(#a5)"/>
+          <line x1="155" y1="231" x2="155" y2="260" stroke="#aab4cc" stroke-width="1.4" marker-end="url(#a5)"/>
+          <line x1="160" y1="231" x2="238" y2="260" stroke="#aab4cc" stroke-width="1.4" marker-end="url(#a5)"/>
+
+          <!-- evaluator-optimizer -->
+          <text x="470" y="180" fill="#e7ecf5" font-size="13" font-weight="700">Evaluator-optimizer</text>
+          <rect x="470" y="210" width="90" height="40" rx="8" fill="#16213d" stroke="#6ea8fe"/><text x="515" y="234" fill="#6ea8fe" font-size="11" text-anchor="middle">generate</text>
+          <rect x="640" y="210" width="90" height="40" rx="8" fill="#3a2418" stroke="#ffb454"/><text x="685" y="234" fill="#ffd29a" font-size="11" text-anchor="middle">critique</text>
+          <line x1="560" y1="224" x2="638" y2="224" stroke="#aab4cc" stroke-width="1.6" marker-end="url(#a5)"/>
+          <path d="M685 250 C 685 285, 515 285, 515 252" fill="none" stroke="#5fd38d" stroke-width="1.6" stroke-dasharray="5 3" marker-end="url(#a5)"/>
+          <text x="600" y="300" fill="#76829e" font-size="10.5" text-anchor="middle">loop until good enough</text>
+        </svg>
+      </div>
+      <figcaption>The five canonical building blocks. Real systems compose these — e.g. an orchestrator that routes, fans out workers in parallel, and runs an evaluator-optimizer loop on the result.<sup class="cite"><a href="#ref25">[25]</a></sup></figcaption>
+    </figure>
+
+    <table>
+      <thead><tr><th>Pattern</th><th>What it does</th><th>Maps to</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Prompt chaining</strong></td><td>Fixed sequence of LLM steps, each feeding the next.</td><td>Deterministic workflow</td></tr>
+        <tr><td><strong>Routing</strong></td><td>An LLM classifies input and sends it down the right branch.</td><td>Controlled flow</td></tr>
+        <tr><td><strong>Parallelization</strong></td><td>Split work across simultaneous calls, then aggregate.</td><td>Controlled flow</td></tr>
+        <tr><td><strong>Orchestrator-workers</strong></td><td>A lead agent dynamically decomposes &amp; delegates.</td><td>Controlled flow → autonomy</td></tr>
+        <tr><td><strong>Evaluator-optimizer</strong></td><td>One agent produces, another critiques, loop to improve.</td><td>Controlled autonomy</td></tr>
+      </tbody>
+    </table>
+
+    <h4>Frameworks for orchestration</h4>
+    <ul>
+      <li><strong>LangGraph</strong> — model your application as a graph of nodes and edges with shared state; ideal for the controlled-flow patterns.<sup class="cite"><a href="#ref27">[27]</a></sup></li>
+      <li><strong>Microsoft AutoGen</strong> — frames multi-agent work as conversations between specialized agents.<sup class="cite"><a href="#ref28">[28]</a></sup></li>
+      <li><strong>OpenAI Agents SDK</strong> — lightweight primitives for agents, handoffs, and guardrails (successor to the experimental Swarm).<sup class="cite"><a href="#ref29">[29]</a></sup></li>
+    </ul>
+
+    <div class="callout note">
+      <div class="tag">A survey for the curious</div>
+      <p>For a structured academic overview of how multiple LLM agents communicate, coordinate, and where the open challenges lie, see Guo et al., <em>"Large Language Model based Multi-Agents: A Survey of Progress and Challenges."</em><sup class="cite"><a href="#ref30">[30]</a></sup></p>
+    </div>
+
+    <p class="src-line">Sources for this section: Multi-agent research system <a href="#ref26">[26]</a>, Building Effective Agents <a href="#ref25">[25]</a>, LangGraph <a href="#ref27">[27]</a>, AutoGen <a href="#ref28">[28]</a>, OpenAI Agents SDK <a href="#ref29">[29]</a>, multi-agent survey <a href="#ref30">[30]</a>.</p>
+  </section>
+
+  <!-- ===================== SECTION 5 ===================== -->
+  <section class="chapter" id="s5">
+    <span class="sec-num">Section 07</span>
+    <h2>The Use Cases of Agentic AI</h2>
+    <p class="section-intro">Everything so far — LLMs, grounding, agency, orchestration — exists to solve real problems. Here are the most impactful, proven use cases, each with the flow that makes it work.</p>
+
+    <!-- Use case 1 -->
+    <h3>1 · Software engineering agents</h3>
+    <p>Coding agents resolve real GitHub issues end-to-end: read the codebase, plan a fix, edit files, run tests, and iterate until green. The <strong>SWE-bench</strong> benchmark measures exactly this on real-world issues,<sup class="cite"><a href="#ref31">[31]</a></sup> and <strong>SWE-agent</strong> showed that giving an LLM a well-designed agent–computer interface dramatically improves its success rate.<sup class="cite"><a href="#ref32">[32]</a></sup> Tools like Claude Code apply this in production.<sup class="cite"><a href="#ref33">[33]</a></sup></p>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 880 90" role="img" aria-label="Coding agent flow">
+        <defs><marker id="f1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6ea8fe"/></marker></defs>
+        <g font-size="12" text-anchor="middle">
+          <rect x="10" y="28" width="120" height="40" rx="9" fill="#1b274a" stroke="#28324f"/><text x="70" y="53" fill="#e7ecf5">Read issue + repo</text>
+          <rect x="160" y="28" width="110" height="40" rx="9" fill="#1b274a" stroke="#28324f"/><text x="215" y="53" fill="#e7ecf5">Plan fix</text>
+          <rect x="300" y="28" width="110" height="40" rx="9" fill="#1b274a" stroke="#28324f"/><text x="355" y="53" fill="#e7ecf5">Edit files</text>
+          <rect x="440" y="28" width="120" height="40" rx="9" fill="#3a2418" stroke="#ffb454"/><text x="500" y="53" fill="#ffd29a">Run tests</text>
+          <rect x="590" y="28" width="120" height="40" rx="9" fill="#16213d" stroke="#6ea8fe"/><text x="650" y="53" fill="#6ea8fe">Pass? / retry</text>
+          <rect x="740" y="28" width="130" height="40" rx="9" fill="#16321f" stroke="#5fd38d"/><text x="805" y="53" fill="#9ff0bd">Open pull request</text>
+        </g>
+        <g stroke="#6ea8fe" stroke-width="1.6">
+          <line x1="130" y1="48" x2="158" y2="48" marker-end="url(#f1)"/><line x1="270" y1="48" x2="298" y2="48" marker-end="url(#f1)"/>
+          <line x1="410" y1="48" x2="438" y2="48" marker-end="url(#f1)"/><line x1="560" y1="48" x2="588" y2="48" marker-end="url(#f1)"/>
+          <line x1="710" y1="48" x2="738" y2="48" marker-end="url(#f1)"/>
+        </g>
+        <path d="M650 68 C 650 86, 500 86, 500 70" fill="none" stroke="#ffb454" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#f1)"/>
+      </svg>
+    </div><figcaption>A coding agent loops through edit → test → observe until the test suite passes, then ships a PR.</figcaption></figure>
+
+    <!-- Use case 2 -->
+    <h3>2 · Deep research agents</h3>
+    <p>A research agent answers a broad question by planning sub-questions, searching many sources in parallel, reading and synthesizing, and producing a cited report. This is the orchestrator-worker pattern in production: a lead agent spawns parallel sub-agents, each researching one angle.<sup class="cite"><a href="#ref26">[26]</a></sup></p>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 880 200" role="img" aria-label="Deep research agent flow">
+        <defs><marker id="f2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8b7bff"/></marker></defs>
+        <g font-size="12" text-anchor="middle">
+          <rect x="20" y="80" width="130" height="44" rx="9" fill="#1b274a" stroke="#28324f"/><text x="85" y="107" fill="#e7ecf5">Research question</text>
+          <rect x="190" y="80" width="130" height="44" rx="9" fill="#1b1233" stroke="#8b7bff"/><text x="255" y="100" fill="#c9b8ff">Lead agent</text><text x="255" y="116" fill="#aab4cc" font-size="10">decompose</text>
+          <rect x="380" y="20" width="150" height="40" rx="9" fill="#1b274a" stroke="#28324f"/><text x="455" y="45" fill="#aab4cc">Sub-agent: angle A</text>
+          <rect x="380" y="80" width="150" height="40" rx="9" fill="#1b274a" stroke="#28324f"/><text x="455" y="105" fill="#aab4cc">Sub-agent: angle B</text>
+          <rect x="380" y="140" width="150" height="40" rx="9" fill="#1b274a" stroke="#28324f"/><text x="455" y="165" fill="#aab4cc">Sub-agent: angle C</text>
+          <rect x="580" y="80" width="120" height="44" rx="9" fill="#16213d" stroke="#6ea8fe"/><text x="640" y="100" fill="#6ea8fe">Synthesize</text><text x="640" y="116" fill="#aab4cc" font-size="10">+ verify</text>
+          <rect x="740" y="80" width="120" height="44" rx="9" fill="#16321f" stroke="#5fd38d"/><text x="800" y="100" fill="#9ff0bd">Cited report</text>
+        </g>
+        <g stroke="#8b7bff" stroke-width="1.6">
+          <line x1="150" y1="102" x2="188" y2="102" marker-end="url(#f2)"/>
+          <line x1="320" y1="98" x2="378" y2="44" marker-end="url(#f2)"/><line x1="320" y1="102" x2="378" y2="100" marker-end="url(#f2)"/><line x1="320" y1="106" x2="378" y2="156" marker-end="url(#f2)"/>
+          <line x1="530" y1="44" x2="578" y2="98" marker-end="url(#f2)"/><line x1="530" y1="100" x2="578" y2="102" marker-end="url(#f2)"/><line x1="530" y1="156" x2="578" y2="106" marker-end="url(#f2)"/>
+          <line x1="700" y1="102" x2="738" y2="102" marker-end="url(#f2)"/>
+        </g>
+      </svg>
+    </div><figcaption>Deep research uses an orchestrator-worker fan-out: parallel sub-agents gather evidence, the lead synthesizes and verifies.<sup class="cite"><a href="#ref26">[26]</a></sup></figcaption></figure>
+
+    <!-- Use case 3 -->
+    <h3>3 · Customer support agents</h3>
+    <p>A support agent resolves tickets autonomously: it understands the request, retrieves the answer from a knowledge base (RAG), takes real actions through tools (issue a refund, update an order), and escalates to a human when it hits its boundary. Anthropic highlights customer support as a high-value agent application because it pairs conversation with concrete, tool-driven resolution.<sup class="cite"><a href="#ref25">[25]</a></sup></p>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 880 110" role="img" aria-label="Customer support agent flow">
+        <defs><marker id="f3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#41d6c3"/></marker></defs>
+        <g font-size="12" text-anchor="middle">
+          <rect x="10" y="38" width="120" height="42" rx="9" fill="#1b274a" stroke="#28324f"/><text x="70" y="63" fill="#e7ecf5">Customer ticket</text>
+          <rect x="160" y="38" width="130" height="42" rx="9" fill="#16213d" stroke="#41d6c3"/><text x="225" y="58" fill="#41d6c3">Retrieve policy</text><text x="225" y="73" fill="#aab4cc" font-size="10">RAG</text>
+          <rect x="320" y="38" width="130" height="42" rx="9" fill="#3a2418" stroke="#ffb454"/><text x="385" y="58" fill="#ffd29a">Take action</text><text x="385" y="73" fill="#aab4cc" font-size="10">refund / update</text>
+          <rect x="480" y="38" width="130" height="42" rx="9" fill="#16213d" stroke="#6ea8fe"/><text x="545" y="58" fill="#6ea8fe">Resolved?</text>
+          <rect x="640" y="8" width="130" height="38" rx="9" fill="#16321f" stroke="#5fd38d"/><text x="705" y="32" fill="#9ff0bd">Reply &amp; close</text>
+          <rect x="640" y="70" width="130" height="38" rx="9" fill="#3a1f28" stroke="#ff7a90"/><text x="705" y="94" fill="#ffaeba">Escalate to human</text>
+        </g>
+        <g stroke="#41d6c3" stroke-width="1.6">
+          <line x1="130" y1="59" x2="158" y2="59" marker-end="url(#f3)"/><line x1="290" y1="59" x2="318" y2="59" marker-end="url(#f3)"/>
+          <line x1="450" y1="59" x2="478" y2="59" marker-end="url(#f3)"/>
+          <line x1="610" y1="52" x2="638" y2="32" marker-end="url(#f3)"/><line x1="610" y1="66" x2="638" y2="86" marker-end="url(#f3)"/>
+        </g>
+      </svg>
+    </div><figcaption>Support agents combine RAG (for grounded answers) with tools (for real actions) and a human-escalation boundary — controlled autonomy in practice.</figcaption></figure>
+
+    <!-- Use case 4 -->
+    <h3>4 · Computer-use agents</h3>
+    <p>Computer-use agents operate a real graphical interface the way a person would: they look at the screen, move the cursor, click, and type to complete tasks across arbitrary software. Anthropic introduced this capability publicly with Claude's computer use, where the model perceives a screenshot and emits mouse/keyboard actions in a loop.<sup class="cite"><a href="#ref34">[34]</a></sup></p>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 760 90" role="img" aria-label="Computer use agent loop">
+        <defs><marker id="f4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6ea8fe"/></marker></defs>
+        <g font-size="12" text-anchor="middle">
+          <rect x="20" y="28" width="150" height="40" rx="9" fill="#16213d" stroke="#6ea8fe"/><text x="95" y="53" fill="#6ea8fe">👁️ See screenshot</text>
+          <rect x="220" y="28" width="150" height="40" rx="9" fill="#1b1233" stroke="#8b7bff"/><text x="295" y="53" fill="#c9b8ff">💭 Decide action</text>
+          <rect x="420" y="28" width="150" height="40" rx="9" fill="#3a2418" stroke="#ffb454"/><text x="495" y="53" fill="#ffd29a">🖱️ Click / type</text>
+          <rect x="620" y="28" width="120" height="40" rx="9" fill="#16321f" stroke="#5fd38d"/><text x="680" y="53" fill="#9ff0bd">Task done?</text>
+        </g>
+        <g stroke="#6ea8fe" stroke-width="1.6">
+          <line x1="170" y1="48" x2="218" y2="48" marker-end="url(#f4)"/><line x1="370" y1="48" x2="418" y2="48" marker-end="url(#f4)"/>
+          <line x1="570" y1="48" x2="618" y2="48" marker-end="url(#f4)"/>
+        </g>
+        <path d="M680 68 C 680 88, 95 88, 95 70" fill="none" stroke="#5fd38d" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#f4)"/>
+      </svg>
+    </div><figcaption>A perceive–decide–act loop over a live screen lets an agent use any application without a custom API.<sup class="cite"><a href="#ref34">[34]</a></sup></figcaption></figure>
+
+    <!-- Use case 5 -->
+    <h3>5 · Data &amp; analytics agents</h3>
+    <p>An analytics agent turns a plain-English question into an answer over real data: it inspects the schema, writes a query (SQL), runs it, checks the result, and explains it — self-correcting if the query errors. This is the ReAct loop applied to databases, and it makes data accessible to non-experts while keeping a human-defined boundary around what the agent may read or write.</p>
+    <figure><div class="diagram">
+      <svg viewBox="0 0 880 100" role="img" aria-label="Analytics agent flow">
+        <defs><marker id="f5" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8b7bff"/></marker></defs>
+        <g font-size="12" text-anchor="middle">
+          <rect x="10" y="34" width="130" height="42" rx="9" fill="#1b274a" stroke="#28324f"/><text x="75" y="59" fill="#e7ecf5">"Top region by Q3?"</text>
+          <rect x="170" y="34" width="120" height="42" rx="9" fill="#16213d" stroke="#41d6c3"/><text x="230" y="59" fill="#41d6c3">Inspect schema</text>
+          <rect x="320" y="34" width="120" height="42" rx="9" fill="#1b1233" stroke="#8b7bff"/><text x="380" y="59" fill="#c9b8ff">Write SQL</text>
+          <rect x="470" y="34" width="120" height="42" rx="9" fill="#3a2418" stroke="#ffb454"/><text x="530" y="59" fill="#ffd29a">Run query</text>
+          <rect x="620" y="34" width="120" height="42" rx="9" fill="#16213d" stroke="#6ea8fe"/><text x="680" y="59" fill="#6ea8fe">Valid? / fix</text>
+          <rect x="770" y="34" width="100" height="42" rx="9" fill="#16321f" stroke="#5fd38d"/><text x="820" y="59" fill="#9ff0bd">Explain</text>
+        </g>
+        <g stroke="#8b7bff" stroke-width="1.6">
+          <line x1="140" y1="55" x2="168" y2="55" marker-end="url(#f5)"/><line x1="290" y1="55" x2="318" y2="55" marker-end="url(#f5)"/>
+          <line x1="440" y1="55" x2="468" y2="55" marker-end="url(#f5)"/><line x1="590" y1="55" x2="618" y2="55" marker-end="url(#f5)"/>
+          <line x1="740" y1="55" x2="768" y2="55" marker-end="url(#f5)"/>
+        </g>
+        <path d="M680 76 C 680 94, 380 94, 380 78" fill="none" stroke="#ffb454" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#f5)"/>
+      </svg>
+    </div><figcaption>The analytics agent writes, runs, and repairs its own queries — a ReAct loop with the database as the environment.</figcaption></figure>
+
+    <div class="callout key">
+      <div class="tag">The common thread</div>
+      <p>Notice the same skeleton in every use case: <strong>an LLM brain, grounded by RAG/tools, looping through act-and-observe, inside a human-defined boundary.</strong> That is the entire arc of this tutorial — from a next-token predictor to a goal-directed agent — applied to a domain.</p>
+    </div>
+
+    <p class="src-line">Sources for this section: SWE-bench <a href="#ref31">[31]</a>, SWE-agent <a href="#ref32">[32]</a>, Claude Code <a href="#ref33">[33]</a>, multi-agent research <a href="#ref26">[26]</a>, Building Effective Agents <a href="#ref25">[25]</a>, computer use <a href="#ref34">[34]</a>.</p>
+  </section>
+
+  <!-- ===================== REFERENCES ===================== -->
+  <section class="chapter" id="refs">
+    <span class="sec-num">Appendix A</span>
+    <h2>References</h2>
+    <p class="section-intro">Every concept in this tutorial is anchored to a primary, authoritative source — a peer-reviewed paper, a foundational preprint, or official documentation. All URLs were verified to resolve at the time of writing.</p>
+    <ol class="refs">
+      <li id="ref1"><b>Attention Is All You Need.</b> <span class="auth">Vaswani, Shazeer, Parmar, Uszkoreit, Jones, Gomez, Kaiser, Polosukhin (2017).</span> <a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener">arxiv.org/abs/1706.03762</a></li>
+      <li id="ref2"><b>Language Models are Few-Shot Learners (GPT-3).</b> <span class="auth">Brown, Mann, Ryder, Subbiah, Kaplan, et al. (2020).</span> <a href="https://arxiv.org/abs/2005.14165" target="_blank" rel="noopener">arxiv.org/abs/2005.14165</a></li>
+      <li id="ref3"><b>Scaling Laws for Neural Language Models.</b> <span class="auth">Kaplan, McCandlish, Henighan, Brown, Chess, Child, Gray, Radford, Wu, Amodei (2020).</span> <a href="https://arxiv.org/abs/2001.08361" target="_blank" rel="noopener">arxiv.org/abs/2001.08361</a></li>
+      <li id="ref4"><b>Training Language Models to Follow Instructions with Human Feedback (InstructGPT).</b> <span class="auth">Ouyang, Wu, Jiang, Almeida, Wainwright, et al. (2022).</span> <a href="https://arxiv.org/abs/2203.02155" target="_blank" rel="noopener">arxiv.org/abs/2203.02155</a></li>
+      <li id="ref5"><b>Neural Machine Translation of Rare Words with Subword Units (Byte-Pair Encoding).</b> <span class="auth">Sennrich, Haddow, Birch (2015/2016).</span> <a href="https://arxiv.org/abs/1508.07909" target="_blank" rel="noopener">arxiv.org/abs/1508.07909</a></li>
+      <li id="ref6"><b>A Survey on Hallucination in Large Language Models: Principles, Taxonomy, Challenges, and Open Questions.</b> <span class="auth">Huang, Yu, Ma, Zhong, Feng, et al. (2023).</span> <a href="https://arxiv.org/abs/2311.05232" target="_blank" rel="noopener">arxiv.org/abs/2311.05232</a></li>
+      <li id="ref7"><b>Survey of Hallucination in Natural Language Generation.</b> <span class="auth">Ji, Lee, Frieske, Yu, Su, et al. (2022).</span> <a href="https://arxiv.org/abs/2202.03629" target="_blank" rel="noopener">arxiv.org/abs/2202.03629</a></li>
+      <li id="ref8"><b>Why Language Models Hallucinate.</b> <span class="auth">Kalai, Nachum, Vempala, Zhang — OpenAI (2025).</span> <a href="https://arxiv.org/abs/2509.04664" target="_blank" rel="noopener">arxiv.org/abs/2509.04664</a> · <a href="https://openai.com/index/why-language-models-hallucinate/" target="_blank" rel="noopener">openai.com</a></li>
+      <li id="ref9"><b>Tracing the Thoughts of a Large Language Model.</b> <span class="auth">Anthropic Interpretability Team (2025).</span> <a href="https://www.anthropic.com/research/tracing-thoughts-language-model" target="_blank" rel="noopener">anthropic.com/research/tracing-thoughts-language-model</a></li>
+      <li id="ref10"><b>Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks.</b> <span class="auth">Lewis, Perez, Piktus, Petroni, Karpukhin, et al. (2020).</span> <a href="https://arxiv.org/abs/2005.11401" target="_blank" rel="noopener">arxiv.org/abs/2005.11401</a></li>
+      <li id="ref11"><b>Dense Passage Retrieval for Open-Domain Question Answering.</b> <span class="auth">Karpukhin, Oğuz, Min, Lewis, Wu, Edunov, Chen, Yih (2020).</span> <a href="https://arxiv.org/abs/2004.04906" target="_blank" rel="noopener">arxiv.org/abs/2004.04906</a></li>
+      <li id="ref12"><b>Efficient and Robust Approximate Nearest Neighbor Search using HNSW Graphs.</b> <span class="auth">Malkov, Yashunin (2016/2018).</span> <a href="https://arxiv.org/abs/1603.09320" target="_blank" rel="noopener">arxiv.org/abs/1603.09320</a></li>
+      <li id="ref13"><b>Retrieval Augmentation Reduces Hallucination in Conversation.</b> <span class="auth">Shuster, Poff, Chen, Kiela, Weston (2021).</span> <a href="https://arxiv.org/abs/2104.07567" target="_blank" rel="noopener">arxiv.org/abs/2104.07567</a></li>
+      <li id="ref14"><b>Recursively Split by Character (RecursiveCharacterTextSplitter).</b> <span class="auth">LangChain Official Documentation.</span> <a href="https://docs.langchain.com/oss/python/integrations/splitters/recursive_text_splitter" target="_blank" rel="noopener">docs.langchain.com — recursive text splitter</a></li>
+      <li id="ref15"><b>Introducing Contextual Retrieval.</b> <span class="auth">Anthropic (2024).</span> <a href="https://www.anthropic.com/engineering/contextual-retrieval" target="_blank" rel="noopener">anthropic.com/engineering/contextual-retrieval</a></li>
+      <li id="ref16"><b>The Probabilistic Relevance Framework: BM25 and Beyond.</b> <span class="auth">Robertson, Zaragoza (2009).</span> <a href="https://www.nowpublishers.com/article/Details/INR-019" target="_blank" rel="noopener">nowpublishers.com — INR-019</a></li>
+      <li id="ref17"><b>Passage Re-ranking with BERT.</b> <span class="auth">Nogueira, Cho (2019).</span> <a href="https://arxiv.org/abs/1901.04085" target="_blank" rel="noopener">arxiv.org/abs/1901.04085</a></li>
+      <li id="ref18"><b>LLM Powered Autonomous Agents.</b> <span class="auth">Lilian Weng (2023).</span> <a href="https://lilianweng.github.io/posts/2023-06-23-agent/" target="_blank" rel="noopener">lilianweng.github.io — LLM powered autonomous agents</a></li>
+      <li id="ref19"><b>Tool Use (Anthropic) / Function Calling (OpenAI) — official documentation.</b> <span class="auth">Anthropic &amp; OpenAI.</span> <a href="https://platform.claude.com/docs/en/docs/build-with-claude/tool-use" target="_blank" rel="noopener">Claude tool use</a> · <a href="https://platform.openai.com/docs/guides/function-calling" target="_blank" rel="noopener">OpenAI function calling</a></li>
+      <li id="ref20"><b>Chain-of-Thought Prompting Elicits Reasoning in Large Language Models.</b> <span class="auth">Wei, Wang, Schuurmans, Bosma, Ichter, Xia, Chi, Le, Zhou (2022).</span> <a href="https://arxiv.org/abs/2201.11903" target="_blank" rel="noopener">arxiv.org/abs/2201.11903</a></li>
+      <li id="ref21"><b>Reflexion: Language Agents with Verbal Reinforcement Learning.</b> <span class="auth">Shinn, Cassano, Berman, Gopinath, Narasimhan, Yao (2023).</span> <a href="https://arxiv.org/abs/2303.11366" target="_blank" rel="noopener">arxiv.org/abs/2303.11366</a></li>
+      <li id="ref22"><b>ReAct: Synergizing Reasoning and Acting in Language Models.</b> <span class="auth">Yao, Zhao, Yu, Du, Shafran, Narasimhan, Cao (2022/2023).</span> <a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener">arxiv.org/abs/2210.03629</a></li>
+      <li id="ref23"><b>Toolformer: Language Models Can Teach Themselves to Use Tools.</b> <span class="auth">Schick, Dwivedi-Yu, Dessì, Raileanu, Lomeli, Zettlemoyer, Cancedda, Scialom (2023).</span> <a href="https://arxiv.org/abs/2302.04761" target="_blank" rel="noopener">arxiv.org/abs/2302.04761</a></li>
+      <li id="ref24"><b>Introducing the Model Context Protocol (MCP).</b> <span class="auth">Anthropic (2024).</span> <a href="https://www.anthropic.com/news/model-context-protocol" target="_blank" rel="noopener">anthropic.com/news/model-context-protocol</a> · <a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener">modelcontextprotocol.io</a></li>
+      <li id="ref25"><b>Building Effective Agents.</b> <span class="auth">Schluntz, Zhang — Anthropic (2024).</span> <a href="https://www.anthropic.com/engineering/building-effective-agents" target="_blank" rel="noopener">anthropic.com/engineering/building-effective-agents</a></li>
+      <li id="ref26"><b>How We Built Our Multi-Agent Research System.</b> <span class="auth">Anthropic (2025).</span> <a href="https://www.anthropic.com/engineering/multi-agent-research-system" target="_blank" rel="noopener">anthropic.com/engineering/multi-agent-research-system</a></li>
+      <li id="ref27"><b>Multi-Agent Systems — LangGraph Documentation.</b> <span class="auth">LangChain.</span> <a href="https://docs.langchain.com/oss/python/langchain/multi-agent" target="_blank" rel="noopener">docs.langchain.com — multi-agent</a> · <a href="https://www.langchain.com/langgraph" target="_blank" rel="noopener">langchain.com/langgraph</a></li>
+      <li id="ref28"><b>AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation.</b> <span class="auth">Wu, Bansal, Zhang, et al. — Microsoft (2023).</span> <a href="https://arxiv.org/abs/2308.08155" target="_blank" rel="noopener">arxiv.org/abs/2308.08155</a> · <a href="https://github.com/microsoft/autogen" target="_blank" rel="noopener">github.com/microsoft/autogen</a></li>
+      <li id="ref29"><b>OpenAI Agents SDK — Multi-Agent Orchestration.</b> <span class="auth">OpenAI.</span> <a href="https://openai.github.io/openai-agents-python/multi_agent/" target="_blank" rel="noopener">openai.github.io/openai-agents-python</a></li>
+      <li id="ref30"><b>Large Language Model based Multi-Agents: A Survey of Progress and Challenges.</b> <span class="auth">Guo, Chen, Wang, et al. (IJCAI 2024).</span> <a href="https://arxiv.org/abs/2402.01680" target="_blank" rel="noopener">arxiv.org/abs/2402.01680</a></li>
+      <li id="ref31"><b>SWE-bench: Can Language Models Resolve Real-World GitHub Issues?</b> <span class="auth">Jimenez, Yang, Wettig, Yao, Pei, Press, Narasimhan (2023).</span> <a href="https://arxiv.org/abs/2310.06770" target="_blank" rel="noopener">arxiv.org/abs/2310.06770</a></li>
+      <li id="ref32"><b>SWE-agent: Agent-Computer Interfaces Enable Automated Software Engineering.</b> <span class="auth">Yang, Jimenez, Wettig, Lieret, Yao, Narasimhan, Press (2024).</span> <a href="https://arxiv.org/abs/2405.15793" target="_blank" rel="noopener">arxiv.org/abs/2405.15793</a></li>
+      <li id="ref33"><b>Claude Code — Official Product &amp; Documentation.</b> <span class="auth">Anthropic.</span> <a href="https://www.anthropic.com/claude-code" target="_blank" rel="noopener">anthropic.com/claude-code</a> · <a href="https://docs.claude.com/en/docs/claude-code" target="_blank" rel="noopener">docs.claude.com</a></li>
+      <li id="ref34"><b>Introducing Computer Use, a New Claude 3.5 Sonnet, and Claude 3.5 Haiku.</b> <span class="auth">Anthropic (2024).</span> <a href="https://www.anthropic.com/news/3-5-models-and-computer-use" target="_blank" rel="noopener">anthropic.com/news/3-5-models-and-computer-use</a></li>
+      <li id="ref35"><b>Efficient Estimation of Word Representations in Vector Space (word2vec).</b> <span class="auth">Mikolov, Chen, Corrado, Dean (2013).</span> <a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">arxiv.org/abs/1301.3781</a></li>
+      <li id="ref36"><b>Linguistic Regularities in Continuous Space Word Representations (the "king − man + woman ≈ queen" result).</b> <span class="auth">Mikolov, Yih, Zweig (NAACL-HLT 2013).</span> <a href="https://aclanthology.org/N13-1090/" target="_blank" rel="noopener">aclanthology.org/N13-1090</a></li>
+      <li id="ref37"><b>GloVe: Global Vectors for Word Representation.</b> <span class="auth">Pennington, Socher, Manning (EMNLP 2014).</span> <a href="https://nlp.stanford.edu/projects/glove/" target="_blank" rel="noopener">nlp.stanford.edu/projects/glove</a> · <a href="https://aclanthology.org/D14-1162/" target="_blank" rel="noopener">aclanthology.org/D14-1162</a></li>
+      <li id="ref38"><b>Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks.</b> <span class="auth">Reimers, Gurevych (2019).</span> <a href="https://arxiv.org/abs/1908.10084" target="_blank" rel="noopener">arxiv.org/abs/1908.10084</a></li>
+      <li id="ref39"><b>"A Synopsis of Linguistic Theory, 1930–1955" — origin of the distributional hypothesis, <em>"You shall know a word by the company it keeps."</em></b> <span class="auth">J. R. Firth (1957), in <em>Studies in Linguistic Analysis</em>, Oxford: Blackwell, p. 11.</span> <a href="https://en.wikipedia.org/wiki/John_Rupert_Firth" target="_blank" rel="noopener">reference: John Rupert Firth</a></li>
+      <li id="ref40"><b>Artificial Intelligence: A Modern Approach (AIMA), 4th ed.</b> <span class="auth">Stuart Russell &amp; Peter Norvig (2020).</span> <a href="http://aima.cs.berkeley.edu/" target="_blank" rel="noopener">aima.cs.berkeley.edu</a></li>
+      <li id="ref41"><b>Deep Learning.</b> <span class="auth">Ian Goodfellow, Yoshua Bengio, Aaron Courville — MIT Press (2016).</span> <a href="https://www.deeplearningbook.org/" target="_blank" rel="noopener">deeplearningbook.org</a></li>
+      <li id="ref42"><b>Deep Learning (Nature review).</b> <span class="auth">Yann LeCun, Yoshua Bengio, Geoffrey Hinton — Nature 521, 436–444 (2015).</span> <a href="https://www.nature.com/articles/nature14539" target="_blank" rel="noopener">nature.com/articles/nature14539</a></li>
+      <li id="ref43"><b>On Discriminative vs. Generative Classifiers: A comparison of logistic regression and naive Bayes.</b> <span class="auth">Andrew Y. Ng &amp; Michael I. Jordan — NIPS (2001).</span> <a href="https://proceedings.neurips.cc/paper/2001/hash/7b7a53e239400a13bd6be6c91c4f6c4e-Abstract.html" target="_blank" rel="noopener">proceedings.neurips.cc — Ng &amp; Jordan 2001</a></li>
+      <li id="ref44"><b>Generative Adversarial Networks (GANs) — a foundational generative model.</b> <span class="auth">Goodfellow, Pouget-Abadie, Mirza, Xu, Warde-Farley, Ozair, Courville, Bengio (2014).</span> <a href="https://arxiv.org/abs/1406.2661" target="_blank" rel="noopener">arxiv.org/abs/1406.2661</a></li>
+      <li id="ref45"><b>On the Opportunities and Risks of Foundation Models.</b> <span class="auth">Bommasani et al. — Stanford CRFM (2021).</span> <a href="https://arxiv.org/abs/2108.07258" target="_blank" rel="noopener">arxiv.org/abs/2108.07258</a></li>
+    </ol>
+  </section>
+
+  <!-- ===================== GLOSSARY ===================== -->
+  <section class="chapter" id="glossary">
+    <span class="sec-num">Appendix B</span>
+    <h2>Quick Glossary</h2>
+    <div class="grid cols-2">
+      <div class="card"><h4>Token</h4><p>The unit an LLM reads and generates — a word or word-fragment.</p></div>
+      <div class="card"><h4>Embedding</h4><p>A numeric vector representing the meaning of text; similar meanings sit close together.</p></div>
+      <div class="card"><h4>Context window</h4><p>The maximum amount of text a model can consider at once.</p></div>
+      <div class="card"><h4>Hallucination</h4><p>Fluent but factually wrong or unsupported model output.</p></div>
+      <div class="card"><h4>RAG</h4><p>Retrieval-Augmented Generation — grounding answers in retrieved documents.</p></div>
+      <div class="card"><h4>Vector database</h4><p>A store optimized for finding the nearest embeddings to a query.</p></div>
+      <div class="card"><h4>Agent</h4><p>An LLM that loops — planning, using tools, and observing results — to reach a goal.</p></div>
+      <div class="card"><h4>ReAct</h4><p>The Thought → Action → Observation loop at the heart of most agents.</p></div>
+      <div class="card"><h4>Tool / function calling</h4><p>Letting a model invoke external code, APIs, or data.</p></div>
+      <div class="card"><h4>MCP</h4><p>Model Context Protocol — an open standard for connecting agents to tools/data.</p></div>
+      <div class="card"><h4>Orchestration</h4><p>Coordinating multiple agents (and humans) toward a shared goal.</p></div>
+      <div class="card"><h4>Autonomy spectrum</h4><p>From fixed human-designed workflows to bounded self-directed agents.</p></div>
+    </div>
+  </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p><strong>From LLMs to Agents</strong> — a developer's guide to Generative &amp; Agentic AI.</p>
+    <p>Built for engineers beginning their journey. Every claim is cited to a primary, authoritative source listed in the References. Verify, don't trust — that is the engineer's discipline, and it is also exactly how we make AI trustworthy.</p>
+  </div>
+</footer>
+
+<script>
+  // Reading progress bar
+  var bar = document.getElementById('progress');
+  function update() {
+    var h = document.documentElement;
+    var scrolled = (h.scrollTop) / (h.scrollHeight - h.clientHeight);
+    bar.style.width = (scrolled * 100) + '%';
+  }
+  document.addEventListener('scroll', update, { passive: true });
+  update();
+
+  // Highlight active TOC item
+  var links = Array.prototype.slice.call(document.querySelectorAll('aside.toc a'));
+  var sections = links.map(function(a){ return document.querySelector(a.getAttribute('href')); }).filter(Boolean);
+  function spy() {
+    var pos = window.scrollY + 120;
+    var current = null;
+    sections.forEach(function(sec){ if (sec.offsetTop <= pos) current = sec.id; });
+    links.forEach(function(a){
+      a.style.color = a.getAttribute('href') === '#' + current ? '#fff' : '';
+      a.style.borderLeftColor = a.getAttribute('href') === '#' + current ? 'var(--brand)' : 'transparent';
+      a.style.background = a.getAttribute('href') === '#' + current ? 'var(--panel)' : '';
+    });
+  }
+  document.addEventListener('scroll', spy, { passive: true });
+  spy();
+</script>
+</body>
+</html>

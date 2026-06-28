@@ -1,0 +1,8 @@
+# Hands-on labs for the Generative & Agentic AI tutorial
+# Install with:  pip install -r requirements.txt
+openai>=1.30.0
+numpy>=1.24.0
+python-dotenv>=1.0.0
+# Lab 4 (UMAP visualization) only:
+umap-learn>=0.5.4
+matplotlib>=3.7.0

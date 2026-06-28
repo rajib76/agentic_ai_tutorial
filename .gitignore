@@ -1,0 +1,15 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Secrets / env
+.env
+*.env
+!*.env.example
+
+# IDE
+.idea/
+
+# Generated lab output
+labs/embeddings_umap_*.png
